@@ -18,6 +18,8 @@ SPECIAL_T "+"|"-"|"*"|"/"|"<"|"<="|">"|">="|"=="|"!="|"="|";"|","|"("|")"|"["|"]
 START_COMMENT   "/*"
 END_COMMENT    "*/"
 
+%x LEXING_ERROR
+
 %%
 
 {START_COMMENT} {
@@ -38,6 +40,13 @@ END_COMMENT    "*/"
 {ID_T} {debug_print("[ %s <Identifier> ]", yytext);}
 {SPECIAL_T} {debug_print("[ %s <Special> ]", yytext);}
 
+.   { BEGIN(LEXING_ERROR);}
+<LEXING_ERROR>{
+    . {
+        debug_print("[ %s <undefined> ]", yytext);
+        BEGIN(INITIAL);
+    };
+}
 %%
 
 #ifdef LEXER_MODE
