@@ -777,7 +777,7 @@ YY_RULE_SETUP
 case 4:
 YY_RULE_SETUP
 #line 35 "cminus/lexer/lexer.l"
-{debug_print("[ %s <DIGIT_EXPR> ]", yytext);}
+{debug_print("[ %s <Number> ]", yytext);}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP

@@ -32,7 +32,7 @@ END_COMMENT    "*/"
     }
 }
 
-{NUMBER_T} {debug_print("[ %s <DIGIT_EXPR> ]", yytext);}
+{NUMBER_T} {debug_print("[ %s <Number> ]", yytext);}
 {KEYWORDS_T} {debug_print("[ %s <Keyword> ]", yytext);}
 {ID_T} {debug_print("[ %s <Identifier> ]", yytext);}
 
