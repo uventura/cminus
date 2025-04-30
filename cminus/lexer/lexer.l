@@ -1,21 +1,40 @@
 %{
-#include <stdio.h>
-
 #include "lexer/tokens.h"
 #include "utils/debug.h"
 %}
+
+%option noyywrap
 
 letter      [a-zA-Z]
 id  {letter}+
 digit       [0-9]
 number      {digit}+
 whitespace  [ \n\t]
+keywords    else|if|int|return|void|while
+any .|\n|\t
 
-%option noyywrap
+%x COMMENT_STATE
+START_COMMENT   "/*"
+END_COMMENT    "*/"
+
 %%
 
-{number} {debug_print("[Digit] %s\n", yytext);}
-{id} {debug_print("[Identifier] %s\n", yytext);}
+{START_COMMENT} {
+    BEGIN(COMMENT_STATE);
+}
+<COMMENT_STATE>{
+    {END_COMMENT} {
+        debug_comment(yytext, 0);
+        BEGIN(INITIAL);
+    }
+    {any} {
+        debug_comment(yytext, 1);
+    }
+}
+
+{number} {debug_print("[ %s <Digit> ]", yytext);}
+{keywords} {debug_print("[ %s <Keyword> ]", yytext);}
+{id} {debug_print("[ %s<Identifier> ]", yytext);}
 
 %%
 
@@ -27,5 +46,7 @@ int main(int argc, char** argv)
     else yyin = stdin;
 
     yylex();
+
+    printf("\n");
 }
 #endif
