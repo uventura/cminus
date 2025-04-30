@@ -63,4 +63,4 @@ lexer: $(OBJS)
 #      CLEAN PROJECT      |
 #==========================
 clean:
-	@rm -rf $(TARGET) $(OBJS) $(BIN_DIR)
+	@rm -rf $(OBJS) $(BIN_DIR)
