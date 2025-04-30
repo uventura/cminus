@@ -5,14 +5,14 @@
 
 %option noyywrap
 
-WHITESPACE_T  [ \n\t]
+WHITESPACE_T  [ ]
 LETTER_T      [a-zA-Z]
 ID_T  {LETTER_T}+
 DIGIT_EXPR       [0-9]
 NUMBER_T      {DIGIT_EXPR}+
 KEYWORDS_T    else|if|int|return|void|while
-ANY_EXPR .|\n|\t
-SPECIAL_T "+"|"-"|"*"|"/"|"<"|"<="|">"|">="|"=="|"!="|"="|";"|","|"("|")"|"["|"]"
+ANY_EXPR .|\n
+SPECIAL_T "+"|"-"|"*"|"/"|"<"|"<="|">"|">="|"=="|"!="|"="|";"|","|"("|")"|"["|"]"|{WHITESPACE_T}
 
 %x COMMENT_STATE
 START_COMMENT   "/*"
@@ -40,13 +40,7 @@ END_COMMENT    "*/"
 {ID_T} {debug_print("[ %s <Identifier> ]", yytext);}
 {SPECIAL_T} {debug_print("[ %s <Special> ]", yytext);}
 
-.   { BEGIN(LEXING_ERROR);}
-<LEXING_ERROR>{
-    . {
-        debug_print("[ %s <undefined> ]", yytext);
-        BEGIN(INITIAL);
-    };
-}
+.   { debug_print("[ %s <undefined> ]", yytext);}
 %%
 
 #ifdef LEXER_MODE
