@@ -323,6 +323,9 @@ void yyfree ( void *  );
 #define YY_AT_BOL() (YY_CURRENT_BUFFER_LVALUE->yy_at_bol)
 
 /* Begin user sect3 */
+
+#define yywrap() (/*CONSTCOND*/1)
+#define YY_SKIP_YYWRAP
 typedef flex_uint8_t YY_CHAR;
 
 FILE *yyin = NULL, *yyout = NULL;
@@ -352,8 +355,8 @@ static void yynoreturn yy_fatal_error ( const char* msg  );
 	(yy_hold_char) = *yy_cp; \
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
-#define YY_NUM_RULES 2
-#define YY_END_OF_BUFFER 3
+#define YY_NUM_RULES 3
+#define YY_END_OF_BUFFER 4
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -361,9 +364,9 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static const flex_int16_t yy_accept[7] =
+static const flex_int16_t yy_accept[10] =
     {   0,
-        0,    0,    3,    2,    1,    0
+        0,    0,    4,    3,    1,    2,    1,    2,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -374,14 +377,14 @@ static const YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    2,    2,    2,
         2,    2,    2,    2,    2,    2,    2,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    3,    3,    3,    3,    3,    3,
+        3,    3,    3,    3,    3,    3,    3,    3,    3,    3,
+        3,    3,    3,    3,    3,    3,    3,    3,    3,    3,
+        1,    1,    1,    1,    1,    1,    3,    3,    3,    3,
 
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        3,    3,    3,    3,    3,    3,    3,    3,    3,    3,
+        3,    3,    3,    3,    3,    3,    3,    3,    3,    3,
+        3,    3,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -398,29 +401,31 @@ static const YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    1
     } ;
 
-static const YY_CHAR yy_meta[3] =
+static const YY_CHAR yy_meta[4] =
     {   0,
-        1,    1
+        1,    2,    3
     } ;
 
-static const flex_int16_t yy_base[7] =
+static const flex_int16_t yy_base[12] =
     {   0,
-        0,    0,    3,    4,    4,    4
+        0,    0,    6,    7,    0,    0,    0,    0,    7,    3,
+        1
     } ;
 
-static const flex_int16_t yy_def[7] =
+static const flex_int16_t yy_def[12] =
     {   0,
-        6,    1,    6,    6,    6,    0
+        9,    1,    9,    9,   10,   11,   10,   11,    0,    9,
+        9
     } ;
 
-static const flex_int16_t yy_nxt[7] =
+static const flex_int16_t yy_nxt[11] =
     {   0,
-        4,    5,    6,    3,    6,    6
+        4,    5,    6,    8,    7,    9,    3,    9,    9,    9
     } ;
 
-static const flex_int16_t yy_chk[7] =
+static const flex_int16_t yy_chk[11] =
     {   0,
-        1,    1,    3,    6,    6,    6
+        1,    1,    1,   11,   10,    3,    9,    9,    9,    9
     } ;
 
 static yy_state_type yy_last_accepting_state;
@@ -443,8 +448,8 @@ char *yytext;
 
 #include "lexer/tokens.h"
 #include "utils/debug.h"
-#line 447 "cminus/lexer/lexer.c"
-#line 448 "cminus/lexer/lexer.c"
+#line 452 "cminus/lexer/lexer.c"
+#line 453 "cminus/lexer/lexer.c"
 
 #define INITIAL 0
 
@@ -661,10 +666,10 @@ YY_DECL
 		}
 
 	{
-#line 13 "cminus/lexer/lexer.l"
+#line 15 "cminus/lexer/lexer.l"
 
 
-#line 668 "cminus/lexer/lexer.c"
+#line 673 "cminus/lexer/lexer.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -691,13 +696,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 7 )
+				if ( yy_current_state >= 10 )
 					yy_c = yy_meta[yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 4 );
+		while ( yy_base[yy_current_state] != 7 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -723,15 +728,20 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 15 "cminus/lexer/lexer.l"
-{debug_print("[Digit] %s\n", yytext); return DIGIT;}
+#line 17 "cminus/lexer/lexer.l"
+{debug_print("[Digit] %s\n", yytext);}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 17 "cminus/lexer/lexer.l"
+#line 18 "cminus/lexer/lexer.l"
+{debug_print("[identifier] %s\n", yytext);}
+	YY_BREAK
+case 3:
+YY_RULE_SETUP
+#line 20 "cminus/lexer/lexer.l"
 ECHO;
 	YY_BREAK
-#line 735 "cminus/lexer/lexer.c"
+#line 745 "cminus/lexer/lexer.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1028,7 +1038,7 @@ static int yy_get_next_buffer (void)
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 7 )
+			if ( yy_current_state >= 10 )
 				yy_c = yy_meta[yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
@@ -1056,11 +1066,11 @@ static int yy_get_next_buffer (void)
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 7 )
+		if ( yy_current_state >= 10 )
 			yy_c = yy_meta[yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
-	yy_is_jam = (yy_current_state == 6);
+	yy_is_jam = (yy_current_state == 9);
 
 		return yy_is_jam ? 0 : yy_current_state;
 }
@@ -1736,7 +1746,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 17 "cminus/lexer/lexer.l"
+#line 20 "cminus/lexer/lexer.l"
 
 
 #ifdef LEXER_MODE

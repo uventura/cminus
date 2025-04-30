@@ -10,9 +10,12 @@ id  {letter}+
 digit       [0-9]
 number      {digit}+
 whitespace  [ \n\t]
+
+%option noyywrap
 %%
 
-{digit} {debug_print("[Digit] %s\n", yytext); return DIGIT;}
+{number} {debug_print("[Digit] %s\n", yytext);}
+{id} {debug_print("[Identifier] %s\n", yytext);}
 
 %%
 
