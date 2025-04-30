@@ -5,14 +5,14 @@
 
 %option noyywrap
 
-WHITESPACE_T  [ ]
+WHITESPACE_T  [ \t]
 LETTER_T      [a-zA-Z]
 ID_T  {LETTER_T}+
 DIGIT_EXPR       [0-9]
 NUMBER_T      {DIGIT_EXPR}+
 KEYWORDS_T    else|if|int|return|void|while
 ANY_EXPR .|\n
-SPECIAL_T "+"|"-"|"*"|"/"|"<"|"<="|">"|">="|"=="|"!="|"="|";"|","|"("|")"|"["|"]"|{WHITESPACE_T}
+SPECIAL_T "+"|"-"|"*"|"/"|"<"|"<="|">"|">="|"=="|"!="|"="|";"|","|"("|")"|"["|"]"|"{"|"}"
 
 %x COMMENT_STATE
 START_COMMENT   "/*"
@@ -35,12 +35,13 @@ END_COMMENT    "*/"
     }
 }
 
-{NUMBER_T} {debug_print("[ %s <Number> ]", yytext);}
-{KEYWORDS_T} {debug_print("[ %s <Keyword> ]", yytext);}
-{ID_T} {debug_print("[ %s <Identifier> ]", yytext);}
-{SPECIAL_T} {debug_print("[ %s <Special> ]", yytext);}
+{NUMBER_T} {debug_print("[ %s \033[0;33m<Number>\033[0m ]", yytext);}
+{KEYWORDS_T} {debug_print("[ %s \033[0;33m<Keyword>\033[0m ]", yytext);}
+{ID_T} {debug_print("[ %s \033[0;33m<Identifier>\033[0m ]", yytext);}
+{WHITESPACE_T}   {debug_print("[ %s \033[0;33m<WhiteSpace>\033[0m ]", yytext);}
+{SPECIAL_T} {debug_print("[ %s \033[0;33m<Special>\033[0m ]", yytext);}
 
-.   { debug_print("[ %s <undefined> ]", yytext);}
+[^\n]   { debug_print("[ %s \033[0;31m<undefined>\033[0m ]", yytext);}
 %%
 
 #ifdef LEXER_MODE

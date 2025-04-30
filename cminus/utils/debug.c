@@ -25,7 +25,7 @@ void debug_comment(char* element, int capture) {
             buffer[index++] = element[0];
     } else {
         buffer[index] = '\0';
-        debug_print("<Start Comment>\n %s\n<End Comment>", buffer);
+        debug_print("\033[0;35m<Start Comment>\033[0m\n %s\n\033[0;35m<End Comment>\033[0m", buffer);
         index = 0;
     }
 }
