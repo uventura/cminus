@@ -5,13 +5,13 @@
 
 %option noyywrap
 
-letter      [a-zA-Z]
-id  {letter}+
-digit       [0-9]
-number      {digit}+
-whitespace  [ \n\t]
-keywords    else|if|int|return|void|while
-any .|\n|\t
+WHITESPACE_T  [ \n\t]
+LETTER_T      [a-zA-Z]
+ID_T  {LETTER_T}+
+DIGIT_EXPR       [0-9]
+NUMBER_T      {DIGIT_EXPR}+
+KEYWORDS_T    else|if|int|return|void|while
+ANY_EXPR .|\n|\t
 
 %x COMMENT_STATE
 START_COMMENT   "/*"
@@ -27,14 +27,14 @@ END_COMMENT    "*/"
         debug_comment(yytext, 0);
         BEGIN(INITIAL);
     }
-    {any} {
+    {ANY_EXPR} {
         debug_comment(yytext, 1);
     }
 }
 
-{number} {debug_print("[ %s <Digit> ]", yytext);}
-{keywords} {debug_print("[ %s <Keyword> ]", yytext);}
-{id} {debug_print("[ %s<Identifier> ]", yytext);}
+{NUMBER_T} {debug_print("[ %s <DIGIT_EXPR> ]", yytext);}
+{KEYWORDS_T} {debug_print("[ %s <Keyword> ]", yytext);}
+{ID_T} {debug_print("[ %s <Identifier> ]", yytext);}
 
 %%
 
