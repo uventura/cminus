@@ -12,6 +12,7 @@ DIGIT_EXPR       [0-9]
 NUMBER_T      {DIGIT_EXPR}+
 KEYWORDS_T    else|if|int|return|void|while
 ANY_EXPR .|\n|\t
+SPECIAL_T "+"|"-"|"*"|"/"|"<"|"<="|">"|">="|"=="|"!="|"="|";"|","|"("|")"|"["|"]"
 
 %x COMMENT_STATE
 START_COMMENT   "/*"
@@ -35,6 +36,7 @@ END_COMMENT    "*/"
 {NUMBER_T} {debug_print("[ %s <Number> ]", yytext);}
 {KEYWORDS_T} {debug_print("[ %s <Keyword> ]", yytext);}
 {ID_T} {debug_print("[ %s <Identifier> ]", yytext);}
+{SPECIAL_T} {debug_print("[ %s <Special> ]", yytext);}
 
 %%
 
