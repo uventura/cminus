@@ -1,6 +1,6 @@
 %{
-#include "lexer/tokens.h"
 #include "utils/debug.h"
+#include "syntactic/syntactic.tab.h"
 %}
 
 %option noyywrap
@@ -35,11 +35,69 @@ END_COMMENT    "*/"
     }
 }
 
-{NUMBER_T} {debug_print("[ %s \033[0;33m<Number>\033[0m ]", yytext);}
-{KEYWORDS_T} {debug_print("[ %s \033[0;33m<Keyword>\033[0m ]", yytext);}
-{ID_T} {debug_print("[ %s \033[0;33m<Identifier>\033[0m ]", yytext);}
-{WHITESPACE_T}   {debug_print("[ %s \033[0;33m<WhiteSpace>\033[0m ]", yytext);}
-{SPECIAL_T} {debug_print("[ %s \033[0;33m<Special>\033[0m ]", yytext);}
+{NUMBER_T} {
+#ifdef LEXER_MODE
+    debug_print("[ %s \033[0;33m<Number>\033[0m ]", yytext);
+#endif
+    return NUMBER;
+}
+{KEYWORDS_T} {
+#ifdef LEXER_MODE
+    debug_print("[ %s \033[0;33m<Keyword>\033[0m ]", yytext);
+#endif
+    if (strcmp(yytext, "else") == 0) return ELSE;
+    else if (strcmp(yytext, "if") == 0) return IF;
+    else if (strcmp(yytext, "int") == 0) return INT;
+    else if (strcmp(yytext, "return") == 0) return RETURN;
+    else if (strcmp(yytext, "void") == 0) return VOID;
+    else if (strcmp(yytext, "while") == 0) return WHILE;
+}
+
+{ID_T} {
+#ifdef LEXER_MODE
+    debug_print("[ %s \033[0;33m<Identifier>\033[0m ]", yytext);
+#endif
+    return ID;
+}
+
+{WHITESPACE_T}   {
+#ifdef LEXER_MODE
+    debug_print("[ %s \033[0;33m<WhiteSpace>\033[0m ]", yytext);
+#endif
+    // Ignore whitespace
+}
+
+{SPECIAL_T} {
+#ifdef LEXER_MODE
+    debug_print("[ %s \033[0;33m<Special>\033[0m ]", yytext);
+#endif
+    if (strcmp(yytext, "+") == 0) return PLUS;
+    else if (strcmp(yytext, "-") == 0) return MINUS;
+    else if (strcmp(yytext, "*") == 0) return MULTIPLY;
+    else if (strcmp(yytext, "/") == 0) return DIVIDE;
+    else if (strcmp(yytext, "<") == 0) return LESS;
+    else if (strcmp(yytext, "<=") == 0) return LESS_EQUAL;
+    else if (strcmp(yytext, ">") == 0) return GREATER;
+    else if (strcmp(yytext, ">=") == 0) return GREATER_EQUAL;
+    else if (strcmp(yytext, "==") == 0) return EQUAL;
+    else if (strcmp(yytext, "!=") == 0) return NOT_EQUAL;
+    else if (strcmp(yytext, "=") == 0) return ASSIGN;
+    else if (strcmp(yytext, ";") == 0) return SEMICOLON;
+    else if (strcmp(yytext, ",") == 0) return COMMA;
+    else if (strcmp(yytext, "(") == 0) return OPEN_PARENTHESIS;
+    else if (strcmp(yytext, ")") == 0) return CLOSE_PARENTHESIS;
+    else if (strcmp(yytext, "[") == 0) return OPEN_BRACKET;
+    else if (strcmp(yytext, "]") == 0) return CLOSE_BRACKET;
+    else if (strcmp(yytext, "{") == 0) return OPEN_BRACES;
+    else if (strcmp(yytext, "}") == 0) return CLOSE_BRACES;
+}
+
+\n {
+#ifdef LEXER_MODE
+    debug_print("[ \\n \033[0;33m<Newline>\033[0m ]");
+#endif
+    // ignore return '\n';
+}
 
 [^\n]   { debug_print("[ %s \033[0;31m<undefined>\033[0m ]", yytext);}
 %%
