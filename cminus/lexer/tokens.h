@@ -23,19 +23,31 @@
 #define GREATER 12
 #define GREATER_EQUAL 13
 #define EQUAL 14
-#define SEMICOLON 15
-#define COMMA 16
-#define OPEN_PARENTHESIS 17
-#define CLOSE_PARENTHESIS 18
-#define OPEN_BRACKET 19
-#define CLOSE_BRACKET 20
-#define OPEN_BRACES 21
-#define CLOSE_BRACES 22
+#define NOT_EQUAL 15
+#define AND 16
+#define OR 17
+#define NOT 18
+#define ASSIGN 19
+#define SEMICOLON 20
+#define COMMA 21
+#define OPEN_PARENTHESIS 22
+#define CLOSE_PARENTHESIS 23
+#define OPEN_BRACKET 24
+#define CLOSE_BRACKET 25
+#define OPEN_BRACES 26
+#define CLOSE_BRACES 27
 
 //|===============|
 //|    COMMENT    |
 //|===============|
-#define START_COMMENT 23
-#define CLOSE_COMMENT 24
+#define START_COMMENT 28
+#define CLOSE_COMMENT 29
+
+//|===============|
+//|   IDENTIFIER  |
+//|===============|
+#define ID 30
+#define NUMBER 31
+
 
 #endif
