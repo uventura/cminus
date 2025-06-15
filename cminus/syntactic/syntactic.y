@@ -23,25 +23,38 @@ void yyerror(char *s);
 %left MULTIPLY DIVIDE
 %right ASSIGN
 
+%nonassoc LESS LESS_EQUAL GREATER GREATER_EQUAL
+%nonassoc EQUAL NOT_EQUAL
+
+
 %nonassoc LOWER_THAN_ELSE
 %nonassoc ELSE
 
 %%
 
-program: block { printf("Program syntax is correct!\n"); } ;
+input: /* empty */
+     | input line
+;
+
+line: program { printf("Program syntax is correct!\n"); }
+;
+
+program: block
+;
 
 block: OPEN_BRACES stmt_list CLOSE_BRACES
-     | OPEN_BRACES CLOSE_BRACES
 ;
 
 stmt_list: stmt stmt_list
+         | /* empty */
 ;
 
 stmt: simple_stmt SEMICOLON
     | compound_stmt
 ;
 
-simple_stmt: identifier ASSIGN expr ;
+simple_stmt: identifier ASSIGN expr
+;
 
 compound_stmt: IF OPEN_PARENTHESIS expr CLOSE_PARENTHESIS stmt %prec LOWER_THAN_ELSE
              | IF OPEN_PARENTHESIS expr CLOSE_PARENTHESIS stmt ELSE stmt
