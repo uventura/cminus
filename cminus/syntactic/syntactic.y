@@ -28,21 +28,13 @@ void yyerror(char *s);
 
 %%
 
-input: /* empty */
-     | input line
-;
-
-line: program { printf("Program syntax is correct!\n"); }
-;
-
-program: block ;
+program: block { printf("Program syntax is correct!\n"); } ;
 
 block: OPEN_BRACES stmt_list CLOSE_BRACES
      | OPEN_BRACES CLOSE_BRACES
 ;
 
 stmt_list: stmt stmt_list
-         | /* empty */
 ;
 
 stmt: simple_stmt SEMICOLON
