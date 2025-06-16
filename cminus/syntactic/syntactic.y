@@ -23,6 +23,10 @@ void yyerror(char *s);
 %left MULTIPLY DIVIDE
 %right ASSIGN
 
+%nonassoc LESS LESS_EQUAL GREATER GREATER_EQUAL
+%nonassoc EQUAL NOT_EQUAL
+
+
 %nonassoc LOWER_THAN_ELSE
 %nonassoc ELSE
 
@@ -35,23 +39,26 @@ input: /* empty */
 line: program { printf("Program syntax is correct!\n"); }
 ;
 
-program: OPEN_BRACES cmd_list CLOSE_BRACES
+program: block
 ;
 
-cmd_list: cmd cmd_list
-        | /* empty */
+block: OPEN_BRACES stmt_list CLOSE_BRACES
 ;
 
-cmd: simple_cmd SEMICOLON
-    | compound_cmd
+stmt_list: stmt stmt_list
+         | /* empty */
 ;
 
-simple_cmd: identifier ASSIGN expr
+stmt: simple_stmt SEMICOLON
+    | compound_stmt
 ;
 
-compound_cmd: IF OPEN_PARENTHESIS cond CLOSE_PARENTHESIS cmd %prec LOWER_THAN_ELSE
-            | IF OPEN_PARENTHESIS cond CLOSE_PARENTHESIS cmd ELSE cmd
-            | program
+simple_stmt: identifier ASSIGN expr
+;
+
+compound_stmt: IF OPEN_PARENTHESIS expr CLOSE_PARENTHESIS stmt %prec LOWER_THAN_ELSE
+             | IF OPEN_PARENTHESIS expr CLOSE_PARENTHESIS stmt ELSE stmt
+             | block
 ;
 
 identifier: ID
@@ -61,19 +68,14 @@ expr: expr MULTIPLY expr
     | expr DIVIDE expr
     | expr PLUS expr
     | expr MINUS expr
+    | expr LESS expr
+    | expr LESS_EQUAL expr
+    | expr GREATER expr
+    | expr GREATER_EQUAL expr
+    | expr EQUAL expr
+    | expr NOT_EQUAL expr
     | identifier
     | NUMBER
-;
-
-cond: expr boolean_operator expr
-;
-
-boolean_operator: LESS
-      | LESS_EQUAL
-      | GREATER
-      | GREATER_EQUAL
-      | EQUAL
-      | NOT_EQUAL
 ;
 
 %%
