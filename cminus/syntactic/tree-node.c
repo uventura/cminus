@@ -33,3 +33,5 @@ TreeNode * newTreeNode(NodeType type, int lineno) {
 //     t->lineno = lineno;
 //     return t;
 // }
+
+TreeNode *rootNode = NULL;  // Definition of global root node

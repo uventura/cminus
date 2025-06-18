@@ -16,10 +16,12 @@ typedef struct treeNode {
         char *name;
         int value;
         char op;
+        int dataType;   // For type information (INT/VOID)
     } attribute;
     int lineno;    
 } TreeNode;
 
 TreeNode * newTreeNode(NodeType type, int lineno);
+extern TreeNode *rootNode;  // Global syntax tree root
 
 #endif

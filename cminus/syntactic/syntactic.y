@@ -2,6 +2,7 @@
 #include <stdio.h> 
 #include <stdlib.h>
 #include "tree-node.h"
+#include "../semantic/semantic.h" 
 
 #define YYSTYPE TreeNode*
 
@@ -41,6 +42,14 @@ line: program { printf("Program syntax is correct!\n"); }
 
 program: block
 ;
+
+program: block { 
+    $$ = $1; 
+    rootNode = $$;  // Set the root node here
+    printf("Program syntax is correct!\n"); 
+}
+;
+
 
 block: OPEN_BRACES stmt_list CLOSE_BRACES
 ;
@@ -82,7 +91,18 @@ expr: expr MULTIPLY expr
 
 int main() 
 {
+
+    rootNode = NULL;  // Initialize rootNode
+    
 	yyparse();
+    
+    if (rootNode) {
+        semanticAnalysis(rootNode);
+    } else {
+        fprintf(stderr, "Error: No syntax tree generated\n");
+        return 1;
+    }
+
     return 0;
 }
 
