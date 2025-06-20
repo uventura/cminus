@@ -69,17 +69,22 @@
 /* First part of user prologue.  */
 #line 1 "cminus/syntactic/syntactic.y"
 
+#define _POSIX_C_SOURCE 200809L
 #include <stdio.h> 
 #include <stdlib.h>
+#include <string.h>
 #include "tree-node.h"
 
 #define YYSTYPE TreeNode*
 
 extern int lineno;
+extern char* yytext;
 int yylex();
 void yyerror(char *s);
 
-#line 83 "cminus/syntactic/syntactic.tab.c"
+TreeNode *root = NULL;
+
+#line 88 "cminus/syntactic/syntactic.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -535,11 +540,11 @@ static const yytype_int8 yytranslate[] =
 
 #if YYDEBUG
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
-static const yytype_int8 yyrline[] =
+static const yytype_uint8 yyrline[] =
 {
-       0,    35,    35,    36,    39,    42,    45,    48,    49,    52,
-      53,    56,    59,    60,    61,    64,    67,    68,    69,    70,
-      71,    72,    73,    74,    75,    76,    77,    78
+       0,    39,    39,    40,    44,    51,    58,    64,    69,    75,
+      78,    84,    92,    97,   103,   109,   116,   122,   128,   134,
+     140,   146,   152,   158,   164,   170,   176,   179
 };
 #endif
 
@@ -1136,13 +1141,242 @@ yyreduce:
   switch (yyn)
     {
   case 4: /* line: program  */
-#line 39 "cminus/syntactic/syntactic.y"
-              { printf("Program syntax is correct!\n"); }
-#line 1142 "cminus/syntactic/syntactic.tab.c"
+#line 44 "cminus/syntactic/syntactic.y"
+            {
+        root = yyvsp[0];
+        printf("Program syntax is correct!\n");
+    }
+#line 1150 "cminus/syntactic/syntactic.tab.c"
+    break;
+
+  case 5: /* program: block  */
+#line 51 "cminus/syntactic/syntactic.y"
+          {
+        yyval = newTreeNode(NProgram, lineno);
+        yyval->children[0] = yyvsp[0];
+    }
+#line 1159 "cminus/syntactic/syntactic.tab.c"
+    break;
+
+  case 6: /* block: OPEN_BRACES stmt_list CLOSE_BRACES  */
+#line 58 "cminus/syntactic/syntactic.y"
+                                       {
+        yyval = yyvsp[-1];
+    }
+#line 1167 "cminus/syntactic/syntactic.tab.c"
+    break;
+
+  case 7: /* stmt_list: stmt stmt_list  */
+#line 64 "cminus/syntactic/syntactic.y"
+                   {
+        yyval = newTreeNode(NCmdList, lineno);
+        yyval->children[0] = yyvsp[-1];
+        yyvsp[-1]->sibling = yyvsp[0];
+    }
+#line 1177 "cminus/syntactic/syntactic.tab.c"
+    break;
+
+  case 8: /* stmt_list: %empty  */
+#line 69 "cminus/syntactic/syntactic.y"
+      { /* vazio */
+        yyval = NULL;
+    }
+#line 1185 "cminus/syntactic/syntactic.tab.c"
+    break;
+
+  case 9: /* stmt: simple_stmt SEMICOLON  */
+#line 75 "cminus/syntactic/syntactic.y"
+                          {
+        yyval = yyvsp[-1];
+    }
+#line 1193 "cminus/syntactic/syntactic.tab.c"
+    break;
+
+  case 10: /* stmt: compound_stmt  */
+#line 78 "cminus/syntactic/syntactic.y"
+                    {
+        yyval = yyvsp[0];
+    }
+#line 1201 "cminus/syntactic/syntactic.tab.c"
+    break;
+
+  case 11: /* simple_stmt: identifier ASSIGN expr  */
+#line 84 "cminus/syntactic/syntactic.y"
+                           {
+        yyval = newTreeNode(NAssign, lineno);
+        yyval->children[0] = yyvsp[-2];
+        yyval->children[1] = yyvsp[0];
+    }
+#line 1211 "cminus/syntactic/syntactic.tab.c"
+    break;
+
+  case 12: /* compound_stmt: IF OPEN_PARENTHESIS expr CLOSE_PARENTHESIS stmt  */
+#line 92 "cminus/syntactic/syntactic.y"
+                                                                          {
+        yyval = newTreeNode(NConditional, lineno);
+        yyval->children[0] = yyvsp[-2]; // condição
+        yyval->children[1] = yyvsp[0]; // if verdadeiro
+    }
+#line 1221 "cminus/syntactic/syntactic.tab.c"
+    break;
+
+  case 13: /* compound_stmt: IF OPEN_PARENTHESIS expr CLOSE_PARENTHESIS stmt ELSE stmt  */
+#line 97 "cminus/syntactic/syntactic.y"
+                                                                {
+        yyval = newTreeNode(NConditional, lineno);
+        yyval->children[0] = yyvsp[-4]; // condição
+        yyval->children[1] = yyvsp[-2]; // if verdadeiro
+        yyval->children[2] = yyvsp[0]; // else
+    }
+#line 1232 "cminus/syntactic/syntactic.tab.c"
+    break;
+
+  case 14: /* compound_stmt: block  */
+#line 103 "cminus/syntactic/syntactic.y"
+            {
+        yyval = yyvsp[0];
+    }
+#line 1240 "cminus/syntactic/syntactic.tab.c"
+    break;
+
+  case 15: /* identifier: ID  */
+#line 109 "cminus/syntactic/syntactic.y"
+       {
+        yyval = newTreeNode(NIdentifier, lineno);
+        yyval->attribute.name = strdup(yytext);
+    }
+#line 1249 "cminus/syntactic/syntactic.tab.c"
+    break;
+
+  case 16: /* expr: expr MULTIPLY expr  */
+#line 116 "cminus/syntactic/syntactic.y"
+                       {
+        yyval = newTreeNode(NOperator, lineno);
+        yyval->attribute.op = '*';
+        yyval->children[0] = yyvsp[-2];
+        yyval->children[1] = yyvsp[0];
+    }
+#line 1260 "cminus/syntactic/syntactic.tab.c"
+    break;
+
+  case 17: /* expr: expr DIVIDE expr  */
+#line 122 "cminus/syntactic/syntactic.y"
+                       {
+        yyval = newTreeNode(NOperator, lineno);
+        yyval->attribute.op = '/';
+        yyval->children[0] = yyvsp[-2];
+        yyval->children[1] = yyvsp[0];
+    }
+#line 1271 "cminus/syntactic/syntactic.tab.c"
+    break;
+
+  case 18: /* expr: expr PLUS expr  */
+#line 128 "cminus/syntactic/syntactic.y"
+                     {
+        yyval = newTreeNode(NOperator, lineno);
+        yyval->attribute.op = '+';
+        yyval->children[0] = yyvsp[-2];
+        yyval->children[1] = yyvsp[0];
+    }
+#line 1282 "cminus/syntactic/syntactic.tab.c"
+    break;
+
+  case 19: /* expr: expr MINUS expr  */
+#line 134 "cminus/syntactic/syntactic.y"
+                      {
+        yyval = newTreeNode(NOperator, lineno);
+        yyval->attribute.op = '-';
+        yyval->children[0] = yyvsp[-2];
+        yyval->children[1] = yyvsp[0];
+    }
+#line 1293 "cminus/syntactic/syntactic.tab.c"
+    break;
+
+  case 20: /* expr: expr LESS expr  */
+#line 140 "cminus/syntactic/syntactic.y"
+                     {
+        yyval = newTreeNode(NOperator, lineno);
+        yyval->attribute.op = '<';
+        yyval->children[0] = yyvsp[-2];
+        yyval->children[1] = yyvsp[0];
+    }
+#line 1304 "cminus/syntactic/syntactic.tab.c"
+    break;
+
+  case 21: /* expr: expr LESS_EQUAL expr  */
+#line 146 "cminus/syntactic/syntactic.y"
+                           {
+        yyval = newTreeNode(NOperator, lineno);
+        yyval->attribute.op = 'l'; // custom op
+        yyval->children[0] = yyvsp[-2];
+        yyval->children[1] = yyvsp[0];
+    }
+#line 1315 "cminus/syntactic/syntactic.tab.c"
+    break;
+
+  case 22: /* expr: expr GREATER expr  */
+#line 152 "cminus/syntactic/syntactic.y"
+                        {
+        yyval = newTreeNode(NOperator, lineno);
+        yyval->attribute.op = '>';
+        yyval->children[0] = yyvsp[-2];
+        yyval->children[1] = yyvsp[0];
+    }
+#line 1326 "cminus/syntactic/syntactic.tab.c"
+    break;
+
+  case 23: /* expr: expr GREATER_EQUAL expr  */
+#line 158 "cminus/syntactic/syntactic.y"
+                              {
+        yyval = newTreeNode(NOperator, lineno);
+        yyval->attribute.op = 'g'; // custom op
+        yyval->children[0] = yyvsp[-2];
+        yyval->children[1] = yyvsp[0];
+    }
+#line 1337 "cminus/syntactic/syntactic.tab.c"
+    break;
+
+  case 24: /* expr: expr EQUAL expr  */
+#line 164 "cminus/syntactic/syntactic.y"
+                      {
+        yyval = newTreeNode(NOperator, lineno);
+        yyval->attribute.op = '=';
+        yyval->children[0] = yyvsp[-2];
+        yyval->children[1] = yyvsp[0];
+    }
+#line 1348 "cminus/syntactic/syntactic.tab.c"
+    break;
+
+  case 25: /* expr: expr NOT_EQUAL expr  */
+#line 170 "cminus/syntactic/syntactic.y"
+                          {
+        yyval = newTreeNode(NOperator, lineno);
+        yyval->attribute.op = '!';
+        yyval->children[0] = yyvsp[-2];
+        yyval->children[1] = yyvsp[0];
+    }
+#line 1359 "cminus/syntactic/syntactic.tab.c"
+    break;
+
+  case 26: /* expr: identifier  */
+#line 176 "cminus/syntactic/syntactic.y"
+                 {
+        yyval = yyvsp[0];
+    }
+#line 1367 "cminus/syntactic/syntactic.tab.c"
+    break;
+
+  case 27: /* expr: NUMBER  */
+#line 179 "cminus/syntactic/syntactic.y"
+             {
+        yyval = newTreeNode(NNumber, lineno);
+        yyval->attribute.value = atoi(yytext);
+    }
+#line 1376 "cminus/syntactic/syntactic.tab.c"
     break;
 
 
-#line 1146 "cminus/syntactic/syntactic.tab.c"
+#line 1380 "cminus/syntactic/syntactic.tab.c"
 
       default: break;
     }
@@ -1335,17 +1569,77 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 81 "cminus/syntactic/syntactic.y"
+#line 185 "cminus/syntactic/syntactic.y"
 
+
+
+/* Begin Printing AST */
+void printSpaces(int level) {
+    for (int i = 0; i < level; i++)
+        printf("  "); // 2 espaços por nível
+}
+
+void printAST(TreeNode *node, int level) {
+    while (node != NULL) {
+        printSpaces(level);
+
+        switch (node->type) {
+            case NProgram:
+                printf("Program\n");
+                break;
+            case NCmdList:
+                printf("Command List\n");
+                break;
+            case NCmd:
+                printf("Command\n");
+                break;
+            case NAssign:
+                printf("Assignment\n");
+                break;
+            case NIdentifier:
+                printf("Identifier: %s\n", node->attribute.name);
+                break;
+            case NNumber:
+                printf("Number: %d\n", node->attribute.value);
+                break;
+            case NExpr:
+                printf("Expr\n");
+                break;
+            case NOperator:
+                printf("Operator: %c\n", node->attribute.op);
+                break;
+            case NConditional:
+                printf("If/Else Statement\n");
+                break;
+            default:
+                printf("Unknown Node\n");
+        }
+
+        // Chama recursivamente nos filhos
+        for (int i = 0; i < MAX_CHILDREN; i++) {
+            if (node->children[i] != NULL) {
+                printAST(node->children[i], level + 1);
+            }
+        }
+
+        // Irmãos no mesmo nível
+        node = node->sibling;
+    }
+}
+/* End Printing AST */
 
 int main() 
 {
 	yyparse();
+    
+    /* Printing AST */
+    printf("\n===== Syntax Tree =====\n");
+    printAST(root, 0);
+    
     return 0;
 }
 
 void yyerror(char *s)
 {
-    extern char* yytext;
     printf("Problema com a analise sintatica! Erro proximo de: '%s'\n", yytext);
 }

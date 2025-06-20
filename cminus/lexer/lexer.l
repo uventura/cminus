@@ -1,6 +1,10 @@
 %{
+#include <stdio.h>
+#include <unistd.h>
 #include "utils/debug.h"
 #include "syntactic/syntactic.tab.h"
+
+int lineno = 1;
 %}
 
 %option noyywrap
@@ -96,7 +100,7 @@ END_COMMENT    "*/"
 #ifdef LEXER_MODE
     debug_print("[ \\n \033[0;33m<Newline>\033[0m ]");
 #endif
-    // ignore return '\n';
+    lineno++;
 }
 
 [^\n]   { debug_print("[ %s \033[0;31m<undefined>\033[0m ]", yytext);}
