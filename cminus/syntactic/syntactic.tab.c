@@ -484,7 +484,7 @@ union yyalloc
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  11
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  28
+#define YYNRULES  27
 /* YYNSTATES -- Number of states.  */
 #define YYNSTATES  48
 
@@ -538,9 +538,9 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    36,    36,    37,    40,    43,    46,    54,    57,    58,
-      61,    62,    65,    68,    69,    70,    73,    76,    77,    78,
-      79,    80,    81,    82,    83,    84,    85,    86,    87
+       0,    36,    36,    37,    40,    43,    54,    57,    58,    61,
+      62,    65,    68,    69,    70,    73,    76,    77,    78,    79,
+      80,    81,    82,    83,    84,    85,    86,    87
 };
 #endif
 
@@ -599,11 +599,11 @@ static const yytype_int8 yypact[] =
    means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       2,     0,     1,     9,     3,     4,     5,    16,     0,    15,
-       0,     9,     0,    11,     0,     0,     7,     8,    10,     0,
-      28,    27,     0,    12,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,    17,    18,    21,    22,    23,
-      24,    25,    26,    13,    19,    20,     0,    14
+       2,     0,     1,     8,     3,     4,     5,    15,     0,    14,
+       0,     8,     0,    10,     0,     0,     6,     7,     9,     0,
+      27,    26,     0,    11,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,    16,    17,    20,    21,    22,
+      23,    24,    25,    12,    18,    19,     0,    13
 };
 
 /* YYPGOTO[NTERM-NUM].  */
@@ -663,17 +663,17 @@ static const yytype_int8 yystos[] =
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    31,    32,    32,    33,    34,    34,    35,    36,    36,
-      37,    37,    38,    39,    39,    39,    40,    41,    41,    41,
-      41,    41,    41,    41,    41,    41,    41,    41,    41
+       0,    31,    32,    32,    33,    34,    35,    36,    36,    37,
+      37,    38,    39,    39,    39,    40,    41,    41,    41,    41,
+      41,    41,    41,    41,    41,    41,    41,    41
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     0,     2,     1,     1,     1,     3,     2,     0,
-       2,     1,     3,     5,     7,     1,     1,     3,     3,     3,
-       3,     3,     3,     3,     3,     3,     3,     1,     1
+       0,     2,     0,     2,     1,     1,     3,     2,     0,     2,
+       1,     3,     5,     7,     1,     1,     3,     3,     3,     3,
+       3,     3,     3,     3,     3,     3,     1,     1
 };
 
 
@@ -1142,18 +1142,8 @@ yyreduce:
 #line 1143 "cminus/syntactic/syntactic.tab.c"
     break;
 
-  case 6: /* program: block  */
-#line 46 "cminus/syntactic/syntactic.y"
-               { 
-    yyval = yyvsp[0]; 
-    rootNode = yyval;  // Set the root node here
-    printf("Program syntax is correct!\n"); 
-}
-#line 1153 "cminus/syntactic/syntactic.tab.c"
-    break;
 
-
-#line 1157 "cminus/syntactic/syntactic.tab.c"
+#line 1147 "cminus/syntactic/syntactic.tab.c"
 
       default: break;
     }

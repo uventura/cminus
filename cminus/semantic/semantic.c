@@ -82,58 +82,41 @@ void checkExpression(TreeNode *node, SymbolTable *table) {
 }
 
 void checkVariable(TreeNode *node, SymbolTable *table) {
-    // if (!node || node->type != NIdentifier) return;
+    if (!node || node->type != NIdentifier) return;
     
-    // Symbol *symbol = lookup(table, node->attribute.name);
-    // if (!symbol) {
-    //     fprintf(stderr, "Error: Variable '%s' not declared (line %d)\n", 
-    //             node->attribute.name, node->lineno);
-    //     exit(1);
-    // }
-    
-    // if (symbol->type != VAR) {
-    //     fprintf(stderr, "Error: '%s' is not a variable (line %d)\n", 
-    //             node->attribute.name, node->lineno);
-    //     exit(1);
-    // }
-
-    void checkVariable(TreeNode *node, SymbolTable *table) {
-        if (!node || node->type != NIdentifier) return;
-        
-        Symbol *symbol = lookup(table, node->attribute.name);
-        if (!symbol) {
-            fprintf(stderr, "Semantic Error: Variable '%s' not declared (line %d)\n", 
-                    node->attribute.name, node->lineno);
-            exit(1);
-        }
-        
-        if (symbol->type != VAR) {
-            fprintf(stderr, "Semantic Error: '%s' is not a variable (line %d)\n", 
-                    node->attribute.name, node->lineno);
-            exit(1);
-        }
-        else {
-            printf("Semantic OK: Variable '%s' properly declared\n", node->attribute.name);
-        }
+    Symbol *symbol = lookup(table, node->attribute.name);
+    if (!symbol) {
+        fprintf(stderr, "Semantic Error: Variable '%s' not declared (line %d)\n", 
+                node->attribute.name, node->lineno);
+        exit(1);
     }
+    
+    if (symbol->type != VAR) {
+        fprintf(stderr, "Semantic Error: '%s' is not a variable (line %d)\n", 
+                node->attribute.name, node->lineno);
+        exit(1);
+    }
+    
+    printf("Semantic OK: Variable '%s' properly declared\n", node->attribute.name);
 }
 
 void checkFunction(TreeNode *node, SymbolTable *table) {
     if (!node || node->type != NIdentifier) return;
-    
+
     Symbol *symbol = lookup(table, node->attribute.name);
     if (!symbol) {
         fprintf(stderr, "Error: Function '%s' not declared (line %d)\n", 
                 node->attribute.name, node->lineno);
         exit(1);
     }
-    
+
     if (symbol->type != FUNC) {
         fprintf(stderr, "Error: '%s' is not a function (line %d)\n", 
                 node->attribute.name, node->lineno);
         exit(1);
     }
 }
+
 
 void checkStatement(TreeNode *node, SymbolTable *table) {
     if (!node) return;

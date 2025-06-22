@@ -43,12 +43,12 @@ line: program { printf("Program syntax is correct!\n"); }
 program: block
 ;
 
-program: block { 
-    $$ = $1; 
-    rootNode = $$;  // Set the root node here
-    printf("Program syntax is correct!\n"); 
-}
-;
+// program: block { 
+//     $$ = $1; 
+//     rootNode = $$;  // Set the root node here
+//     printf("Program syntax is correct!\n"); 
+// }
+// ;
 
 
 block: OPEN_BRACES stmt_list CLOSE_BRACES

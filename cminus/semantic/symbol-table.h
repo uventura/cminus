@@ -1,7 +1,7 @@
 #ifndef SYMBOL_TABLE_H
 #define SYMBOL_TABLE_H
 
-#include "tree-node.h"
+#include "../syntactic/tree-node.h"
 
 typedef enum {
     VAR,

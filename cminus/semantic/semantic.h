@@ -1,7 +1,7 @@
 #ifndef SEMANTIC_H
 #define SEMANTIC_H
 
-#include "tree-node.h"
+#include "../syntactic/tree-node.h"
 #include "symbol-table.h"
 
 void semanticAnalysis(TreeNode *syntaxTree);
