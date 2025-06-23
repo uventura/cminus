@@ -37,6 +37,8 @@ void exitScope(SymbolTable *table) {
 }
 
 Symbol* lookup(SymbolTable *table, const char *name) {
+    // printf("\tDEBUG LOOKING UP: %s at scope %d\n", name, table->currentScope);   //# DEBUG
+
     if (!table || !name) return NULL;
     
     Symbol *current = table->head;
@@ -50,6 +52,8 @@ Symbol* lookup(SymbolTable *table, const char *name) {
 }
 
 Symbol* insert(SymbolTable *table, const char *name, SymbolType type, int dataType) {
+    // printf("INSERTING: %s at scope %d\n", name, table->currentScope);  //# DEBUG
+
     if (!table || !name) return NULL;
     
     // Check for redeclaration in current scope!

@@ -544,10 +544,10 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    41,    41,    43,    44,    48,    51,    67,    72,    78,
-      78,    85,    95,   101,   104,   107,   111,   118,   119,   120,
-     124,   131,   132,   133,   134,   135,   136,   137,   138,   139,
-     140,   141,   142
+       0,    41,    41,    43,    44,    48,    51,    65,    70,    77,
+      81,    89,    99,   105,   108,   111,   115,   122,   123,   124,
+     128,   135,   136,   137,   138,   139,   140,   141,   142,   143,
+     144,   145,   146
 };
 #endif
 
@@ -1165,10 +1165,8 @@ yyreduce:
                { 
     printf("Program node creation\n");
     if (yyvsp[0] == NULL) {
-        printf("Block is NULL!\n");
-    } else {
-        printf("Block type: %d, line: %d\n", yyvsp[0]->type, yyvsp[0]->lineno);
-    }
+        printf("!! Block is NULL!\n");
+    } 
     yyval = newTreeNode(NProgram, yylineno);
     if (yyval == NULL) {
         printf("Failed to create program node!\n");
@@ -1177,39 +1175,48 @@ yyreduce:
     rootNode = yyval;
     printf("Root node set to %p\n", (void*)rootNode);
 }
-#line 1181 "cminus/syntactic/syntactic.tab.c"
+#line 1179 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 7: /* block: OPEN_BRACES stmt_list CLOSE_BRACES  */
-#line 67 "cminus/syntactic/syntactic.y"
+#line 65 "cminus/syntactic/syntactic.y"
                                           {
     yyval = newTreeNode(NBlock, yylineno);
     yyval->children[0] = yyvsp[-1];  // stmt_list
 }
-#line 1190 "cminus/syntactic/syntactic.tab.c"
+#line 1188 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 8: /* declaration: type_specifier identifier SEMICOLON  */
-#line 72 "cminus/syntactic/syntactic.y"
+#line 70 "cminus/syntactic/syntactic.y"
                                                  {
     yyval = newTreeNode(NDeclaration, yylineno);
     yyval->children[0] = yyvsp[-2];  // type (INT/VOID)
     yyval->children[1] = yyvsp[-1];  // identifier (e.g., "a")
 }
-#line 1200 "cminus/syntactic/syntactic.tab.c"
+#line 1198 "cminus/syntactic/syntactic.tab.c"
+    break;
+
+  case 9: /* type_specifier: INT  */
+#line 77 "cminus/syntactic/syntactic.y"
+        {
+        yyval = newTreeNode(NType, yylineno);
+        yyval->attribute.dataType = INT;
+    }
+#line 1207 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 10: /* type_specifier: VOID  */
-#line 78 "cminus/syntactic/syntactic.y"
-                           {
-    yyval = newTreeNode(NType, yylineno);
-    yyval->attribute.dataType = (yyvsp[0] == INT) ? INT : VOID;
-}
-#line 1209 "cminus/syntactic/syntactic.tab.c"
+#line 81 "cminus/syntactic/syntactic.y"
+         {
+        yyval = newTreeNode(NType, yylineno);
+        yyval->attribute.dataType = VOID;
+    }
+#line 1216 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 11: /* stmt_list: stmt stmt_list  */
-#line 85 "cminus/syntactic/syntactic.y"
+#line 89 "cminus/syntactic/syntactic.y"
                    {
         if (yyvsp[-1] == NULL) {
             yyval = yyvsp[0];
@@ -1220,54 +1227,54 @@ yyreduce:
             yyval = yyvsp[-1];
         }
     }
-#line 1224 "cminus/syntactic/syntactic.tab.c"
+#line 1231 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 12: /* stmt_list: %empty  */
-#line 95 "cminus/syntactic/syntactic.y"
+#line 99 "cminus/syntactic/syntactic.y"
                 {
         yyval = NULL;
     }
-#line 1232 "cminus/syntactic/syntactic.tab.c"
+#line 1239 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 13: /* stmt: simple_stmt SEMICOLON  */
-#line 101 "cminus/syntactic/syntactic.y"
+#line 105 "cminus/syntactic/syntactic.y"
                           {
         yyval = yyvsp[-1];
     }
-#line 1240 "cminus/syntactic/syntactic.tab.c"
+#line 1247 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 14: /* stmt: compound_stmt  */
-#line 104 "cminus/syntactic/syntactic.y"
+#line 108 "cminus/syntactic/syntactic.y"
                   {
         yyval = yyvsp[0];
     }
-#line 1248 "cminus/syntactic/syntactic.tab.c"
+#line 1255 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 16: /* simple_stmt: identifier ASSIGN expr  */
-#line 111 "cminus/syntactic/syntactic.y"
+#line 115 "cminus/syntactic/syntactic.y"
                            {
         yyval = newTreeNode(NAssign, yylineno);
         yyval->children[0] = yyvsp[-2];
         yyval->children[1] = yyvsp[0];
     }
-#line 1258 "cminus/syntactic/syntactic.tab.c"
+#line 1265 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 20: /* identifier: ID  */
-#line 124 "cminus/syntactic/syntactic.y"
+#line 128 "cminus/syntactic/syntactic.y"
        {
         yyval = newTreeNode(NIdentifier, yylineno);
         yyval->attribute.name = strdup(yytext);
     }
-#line 1267 "cminus/syntactic/syntactic.tab.c"
+#line 1274 "cminus/syntactic/syntactic.tab.c"
     break;
 
 
-#line 1271 "cminus/syntactic/syntactic.tab.c"
+#line 1278 "cminus/syntactic/syntactic.tab.c"
 
       default: break;
     }
@@ -1460,19 +1467,17 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 145 "cminus/syntactic/syntactic.y"
+#line 149 "cminus/syntactic/syntactic.y"
 
 
 int main() 
 {
-
-    printf("===> MAIN <===\n");
     rootNode = NULL; 
     
     yyparse();
-    printf("Root node after parse: %p\n", (void*)rootNode);
     
     if (rootNode) {
+        printf("Semantic analysis:\n");
         semanticAnalysis(rootNode);
         freeTree(rootNode);
     } else {

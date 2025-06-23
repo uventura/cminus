@@ -1,5 +1,3 @@
-int main() {
-    x = 5;  // Undeclared variable
-    y = x + z;  // Undeclared variables
-    return q;  // Undeclared variable
+{
+    a = 2;
 }

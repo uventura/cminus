@@ -51,10 +51,8 @@ line: program { printf("Program syntax is correct!\n"); }
 program: block { 
     printf("Program node creation\n");
     if ($1 == NULL) {
-        printf("Block is NULL!\n");
-    } else {
-        printf("Block type: %d, line: %d\n", $1->type, $1->lineno);
-    }
+        printf("!! Block is NULL!\n");
+    } 
     $$ = newTreeNode(NProgram, yylineno);
     if ($$ == NULL) {
         printf("Failed to create program node!\n");
@@ -75,10 +73,16 @@ declaration: type_specifier identifier SEMICOLON {
     $$->children[1] = $2;  // identifier (e.g., "a")
 };
 
-type_specifier: INT | VOID {
-    $$ = newTreeNode(NType, yylineno);
-    $$->attribute.dataType = ($1 == INT) ? INT : VOID;
-};
+type_specifier:
+    INT {
+        $$ = newTreeNode(NType, yylineno);
+        $$->attribute.dataType = INT;
+    }
+  | VOID {
+        $$ = newTreeNode(NType, yylineno);
+        $$->attribute.dataType = VOID;
+    }
+;
 
 
 stmt_list:
@@ -146,14 +150,12 @@ expr: expr MULTIPLY expr
 
 int main() 
 {
-
-    printf("===> MAIN <===\n");
     rootNode = NULL; 
     
     yyparse();
-    printf("Root node after parse: %p\n", (void*)rootNode);
     
     if (rootNode) {
+        printf("Semantic analysis:\n");
         semanticAnalysis(rootNode);
         freeTree(rootNode);
     } else {
