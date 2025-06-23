@@ -13,6 +13,12 @@ void checkDeclaration(TreeNode *node, SymbolTable *table);
 void checkStatement(TreeNode *node, SymbolTable *table);
 void checkExpression(TreeNode *node, SymbolTable *table);
 
+void checkBlock(TreeNode *node, SymbolTable *table);
+void checkAssignment(TreeNode *node, SymbolTable *table);
+void checkIfStatement(TreeNode *node, SymbolTable *table);
+void checkWhileStatement(TreeNode *node, SymbolTable *table);
+void checkReturnStatement(TreeNode *node, SymbolTable *table);
+
 // Type checking functions
 int getExpressionType(TreeNode *expr, SymbolTable *table);
 void checkTypeCompatibility(int expected, int actual, int lineno, const char *context);

@@ -1,13 +1,17 @@
+//must set $$ in every rule that returns a TreeNode*
 %{
 #include <stdio.h> 
 #include <stdlib.h>
 #include "tree-node.h"
+#include <string.h> 
 #include "../semantic/semantic.h" 
 
 #define YYSTYPE TreeNode*
 
 extern int lineno;
+extern int yylineno;
 extern TreeNode *rootNode;
+extern char* yytext;
 int yylex();
 void yyerror(char *s);
 %}
@@ -34,35 +38,81 @@ void yyerror(char *s);
 
 %%
 
-input: /* empty */
-     | input line
+input:
+    /* empty */
+  | input line
+  | error { yyerror("Invalid input"); yyclearin; }
 ;
+
 
 line: program { printf("Program syntax is correct!\n"); }
 ;
 
-
-
 program: block { 
-    $$ = $1; 
+    printf("Program node creation\n");
+    if ($1 == NULL) {
+        printf("Block is NULL!\n");
+    } else {
+        printf("Block type: %d, line: %d\n", $1->type, $1->lineno);
+    }
+    $$ = newTreeNode(NProgram, yylineno);
+    if ($$ == NULL) {
+        printf("Failed to create program node!\n");
+    }
+    $$->children[0] = $1;
     rootNode = $$;
-    printf("Setting root node at %p\n", (void*)rootNode);
-    printf("Program syntax is correct!\n"); 
+    printf("Root node set to %p\n", (void*)rootNode);
 }
 
+block: OPEN_BRACES stmt_list CLOSE_BRACES {
+    $$ = newTreeNode(NBlock, yylineno);
+    $$->children[0] = $2;  // stmt_list
+}
 
-block: OPEN_BRACES stmt_list CLOSE_BRACES
+declaration: type_specifier identifier SEMICOLON {
+    $$ = newTreeNode(NDeclaration, yylineno);
+    $$->children[0] = $1;  // type (INT/VOID)
+    $$->children[1] = $2;  // identifier (e.g., "a")
+};
+
+type_specifier: INT | VOID {
+    $$ = newTreeNode(NType, yylineno);
+    $$->attribute.dataType = ($1 == INT) ? INT : VOID;
+};
+
+
+stmt_list:
+    stmt stmt_list {
+        if ($1 == NULL) {
+            $$ = $2;
+        } else {
+            TreeNode* t = $1;
+            while (t->sibling) t = t->sibling;
+            t->sibling = $2;
+            $$ = $1;
+        }
+    }
+  | /* empty */ {
+        $$ = NULL;
+    }
 ;
 
-stmt_list: stmt stmt_list
-         | /* empty */
+stmt:
+    simple_stmt SEMICOLON {
+        $$ = $1;
+    }
+  | compound_stmt {
+        $$ = $1;
+    }
+  | declaration 
 ;
 
-stmt: simple_stmt SEMICOLON
-    | compound_stmt
-;
-
-simple_stmt: identifier ASSIGN expr
+simple_stmt:
+    identifier ASSIGN expr {
+        $$ = newTreeNode(NAssign, yylineno);
+        $$->children[0] = $1;
+        $$->children[1] = $3;
+    }
 ;
 
 compound_stmt: IF OPEN_PARENTHESIS expr CLOSE_PARENTHESIS stmt %prec LOWER_THAN_ELSE
@@ -70,8 +120,13 @@ compound_stmt: IF OPEN_PARENTHESIS expr CLOSE_PARENTHESIS stmt %prec LOWER_THAN_
              | block
 ;
 
-identifier: ID
+identifier:
+    ID {
+        $$ = newTreeNode(NIdentifier, yylineno);
+        $$->attribute.name = strdup(yytext);
+    }
 ;
+
 
 expr: expr MULTIPLY expr
     | expr DIVIDE expr
@@ -91,13 +146,16 @@ expr: expr MULTIPLY expr
 
 int main() 
 {
-    rootNode = NULL;  // Initialize rootNode
+
+    printf("===> MAIN <===\n");
+    rootNode = NULL; 
     
     yyparse();
     printf("Root node after parse: %p\n", (void*)rootNode);
     
     if (rootNode) {
         semanticAnalysis(rootNode);
+        freeTree(rootNode);
     } else {
         fprintf(stderr, "Error: No syntax tree generated\n");
         return 1;

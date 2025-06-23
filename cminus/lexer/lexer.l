@@ -6,6 +6,9 @@
 
 %option noyywrap
 
+extern int yylineno;
+int yylineno = 1;  
+
 WHITESPACE_T  [ \t]
 LETTER_T      [a-zA-Z]
 ID_T  {LETTER_T}+
@@ -14,7 +17,6 @@ NUMBER_T      {DIGIT_EXPR}+
 KEYWORDS_T    "else"|"if"|"int"|"return"|"void"|"while" 
 ANY_EXPR .|\n
 SPECIAL_T "+"|"-"|"*"|"/"|"<"|"<="|">"|">="|"=="|"!="|"="|";"|","|"("|")"|"["|"]"|"{"|"}"
-
 
 
 %x COMMENT_STATE

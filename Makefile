@@ -15,8 +15,7 @@ CFLAGS += -g
 CFLAGS += -Wno-unused-parameter
 CFLAGS += -Wno-implicit-fallthrough
 CFLAGS += -D_GNU_SOURCE  # For POSIX functions
-CFLAGS += -lfl 
-
+CFLAGS += -lfl
 
 OBJ_DIR = obj
 
@@ -32,6 +31,9 @@ SYNTACTIC_OUT = cminus/syntactic/syntactic.tab.c
 SYNTACTIC_HDR = cminus/syntactic/syntactic.tab.h
 SYNTACTIC_OBJ = $(OBJ_DIR)/syntactic.o
 SYNTACTIC_MODE_FLAG = SYNTACTIC_MODE
+
+SEMANTIC_BIN = semantic
+SEMANTIC_MODE_FLAG = SEMANTIC_MODE
 
 SRC_DIR = cminus
 
@@ -49,7 +51,7 @@ all: $(TARGET)
 #==========================
 #        BUILDING         |
 #==========================
-$(TARGET): $(OBJS)
+$(TARGET): $(OBJS) $(LEXER_OBJ) $(SYNTACTIC_OBJ)
 	@echo "> Building C-Minus project"
 	@mkdir -p $(BIN_DIR)
 	@$(CC) -o $(BIN_DIR)/$@ $^ $(CFLAGS) -O3 -Icminus
@@ -64,7 +66,7 @@ $(LEXER_OBJ): $(LEXER_OUT) $(SYNTACTIC_HDR)
 	@$(CC) $(CFLAGS) -o $@ -c $< -Icminus
 
 #====================
-#|		LEXER		|
+#|      LEXER       |
 #====================
 gen_lexer:
 	@echo "> Generating Lexer File..."
@@ -75,11 +77,11 @@ lexer: $(OBJS) $(LEXER_OBJ) $(SYNTACTIC_HDR)
 	@echo "Building Lexer..."
 	@flex -o $(LEXER_OUT) $(LEXER_IN)
 	@mkdir -p $(BIN_DIR)
-	@$(CC) -o $(BIN_DIR)/$@ $^ $(CFLAGS) -O3 -Icminus -DDEBUG -DLEXER_MODE
+	@$(CC) -o $(BIN_DIR)/$@ $^ $(CFLAGS) -O3 -Icminus -DDEBUG -D$(LEXER_MODE_FLAG)
 	@echo "> Successfully generated!"
 
 #====================
-#|		SYNTATIC	|
+#|    SYNACTIC    |
 #====================
 gen_syntactic:
 	@echo "> Generating Syntactic Files..."
@@ -102,9 +104,20 @@ syntactic: $(OBJS) $(LEXER_OBJ) $(SYNTACTIC_OBJ) $(SYNTACTIC_HDR)
 	@$(CC) -o $(BIN_DIR)/$@ $^ $(CFLAGS) -O3 -Icminus -DDEBUG
 	@echo "> Successfully generated!"
 
+#====================
+#|     SEMANTIC     |
+#====================
+semantic: $(OBJS) $(LEXER_OBJ) $(SYNTACTIC_OBJ) $(SYNTACTIC_HDR)
+	@echo "Building Semantic..."
+	@flex -o $(LEXER_OUT) $(LEXER_IN)
+	@bison -Wcounterexamples -d --defines=$(SYNTACTIC_HDR) -o $(SYNTACTIC_OUT) $(SYNTACTIC_IN)
+	@mkdir -p $(BIN_DIR)
+	@$(CC) -o $(BIN_DIR)/$(SEMANTIC_BIN) $^ $(CFLAGS) -O3 -Icminus -DDEBUG -D$(SEMANTIC_MODE_FLAG)
+	@echo "> Successfully generated!"
+
 #==========================
 #      CLEAN PROJECT      |
 #==========================
 clean:
-	@rm -rf $(OBJS) $(LEXER_OBJ) $(BIN_DIR) $(LEXER_OUT) $(SYNTACTIC_OUT) $(SYNTACTIC_HDR) $(SYNTACTIC_OBJ)
+	@rm -rf $(OBJ_DIR) $(BIN_DIR) $(LEXER_OUT) $(SYNTACTIC_OUT) $(SYNTACTIC_HDR)
 	@echo "Cleaned."

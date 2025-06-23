@@ -703,7 +703,7 @@ YY_DECL
 		}
 
 	{
-#line 26 "cminus/lexer/lexer.l"
+#line 28 "cminus/lexer/lexer.l"
 
 
 #line 710 "cminus/lexer/lexer.c"
@@ -765,7 +765,7 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 28 "cminus/lexer/lexer.l"
+#line 30 "cminus/lexer/lexer.l"
 {
     BEGIN(COMMENT_STATE);
 }
@@ -773,7 +773,7 @@ YY_RULE_SETUP
 
 case 2:
 YY_RULE_SETUP
-#line 32 "cminus/lexer/lexer.l"
+#line 34 "cminus/lexer/lexer.l"
 {
         debug_comment(yytext, 0);
         BEGIN(INITIAL);
@@ -782,7 +782,7 @@ YY_RULE_SETUP
 case 3:
 /* rule 3 can match eol */
 YY_RULE_SETUP
-#line 36 "cminus/lexer/lexer.l"
+#line 38 "cminus/lexer/lexer.l"
 {
         debug_comment(yytext, 1);
     }
@@ -790,7 +790,7 @@ YY_RULE_SETUP
 
 case 4:
 YY_RULE_SETUP
-#line 41 "cminus/lexer/lexer.l"
+#line 43 "cminus/lexer/lexer.l"
 {
 #ifdef LEXER_MODE
     debug_print("[ %s \033[0;33m<Number>\033[0m ]", yytext);
@@ -801,7 +801,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 48 "cminus/lexer/lexer.l"
+#line 50 "cminus/lexer/lexer.l"
 {
 #ifdef LEXER_MODE
     debug_print("[ %s \033[0;33m<Keyword>\033[0m ]", yytext);
@@ -816,7 +816,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 60 "cminus/lexer/lexer.l"
+#line 62 "cminus/lexer/lexer.l"
 {
 #ifdef LEXER_MODE
     debug_print("[ %s \033[0;33m<Identifier>\033[0m ]", yytext);
@@ -826,7 +826,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 67 "cminus/lexer/lexer.l"
+#line 69 "cminus/lexer/lexer.l"
 {
 #ifdef LEXER_MODE
     debug_print("[ %s \033[0;33m<WhiteSpace>\033[0m ]", yytext);
@@ -836,7 +836,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 74 "cminus/lexer/lexer.l"
+#line 76 "cminus/lexer/lexer.l"
 {
 #ifdef LEXER_MODE
     debug_print("[ %s \033[0;33m<Special>\033[0m ]", yytext);
@@ -865,7 +865,7 @@ YY_RULE_SETUP
 case 9:
 /* rule 9 can match eol */
 YY_RULE_SETUP
-#line 99 "cminus/lexer/lexer.l"
+#line 101 "cminus/lexer/lexer.l"
 {
 #ifdef LEXER_MODE
     debug_print("[ \\n \033[0;33m<Newline>\033[0m ]");
@@ -875,12 +875,12 @@ YY_RULE_SETUP
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 106 "cminus/lexer/lexer.l"
+#line 108 "cminus/lexer/lexer.l"
 { debug_print("[ %s \033[0;31m<undefined>\033[0m ]", yytext);}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 107 "cminus/lexer/lexer.l"
+#line 109 "cminus/lexer/lexer.l"
 ECHO;
 	YY_BREAK
 #line 887 "cminus/lexer/lexer.c"
@@ -1890,7 +1890,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 107 "cminus/lexer/lexer.l"
+#line 109 "cminus/lexer/lexer.l"
 
 
 #ifdef LEXER_MODE

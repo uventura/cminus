@@ -3,7 +3,7 @@
     y = 10;
     if (x < y) {
         y = y - x;
-        a = b;
+        
     } else {
         x = x - y;
     }

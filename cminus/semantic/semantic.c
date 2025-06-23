@@ -35,10 +35,13 @@ void semanticAnalysis(TreeNode *syntaxTree) {
     }
     
     freeSymbolTable(table);
+    printf("Semantic analysis completed successfully!\n");
 }
 
 void checkProgram(TreeNode *node, SymbolTable *table) {
-    if (!node || node->type != NProgram) {
+    printf("  DEBUG: checkProgram() called with node type %d \n", node->type);
+
+    if (!node ) {
         semanticError(node ? node->lineno : 0, "Expected program node");
         return;
     }
@@ -49,14 +52,75 @@ void checkProgram(TreeNode *node, SymbolTable *table) {
     TreeNode *child = node->children[0]; // First child is typically declarations
     while (child) {
         switch (child->type) {
+            case NProgram:
+                semanticError(child->lineno, "Nested program found");
+                break;
+            case NCmdList:
+                // Command list - check all commands
+                {
+                    TreeNode *cmd = child->children[0];
+                    while (cmd) {
+                        checkProgram(cmd, table);
+                        cmd = cmd->sibling;
+                    }
+                }
+                break;
+            case NCmd:
+                // Command - could be declaration or statement
+                if (child->children[0]) {
+                    checkProgram(child->children[0], table);
+                }
+                break;
             case NDeclaration:
                 checkDeclaration(child, table);
                 break;
             case NStatement:
                 checkStatement(child, table);
                 break;
+            case NBlock:
+                enterScope(table);
+                checkBlock(child, table);
+                exitScope(table);
+                break;
+            case NAssignStmt:
+                checkAssignment(child, table);
+                break;
+            case NIdentifier:
+                if (!lookup(table, child->attribute.name)) {
+                    semanticError(child->lineno, "Undeclared identifier '%s'", child->attribute.name);
+                }
+                break;
+            case NExpr:
+                checkExpression(child, table);
+                break;
+            case NOperator:
+                if (child->children[0]) checkExpression(child->children[0], table);
+                if (child->children[1]) checkExpression(child->children[1], table);
+                break;
+            case NNumber:
+                break;
+            case NIfStmt:
+                checkIfStatement(child, table);
+                break;
+            case NWhileStmt:
+                checkWhileStatement(child, table);
+                break;
+            case NReturnStmt:
+                checkReturnStatement(child, table);
+                break;
+            case NCompoundStmt:
+                enterScope(table);
+                checkStatement(child, table);
+                exitScope(table);
+                break;
+            case NCall:
+                checkFunctionCall(child, table);
+                break;
+            case NAssign:
+                checkAssignment(child, table);
+                break;
             default:
-                semanticError(child->lineno, "Unexpected node type in program");
+                semanticError(child->lineno, "Unexpected node type %d in program", child->type);
                 break;
         }
         child = child->sibling;
@@ -64,6 +128,113 @@ void checkProgram(TreeNode *node, SymbolTable *table) {
     
     exitScope(table);
 }
+
+void checkBlock(TreeNode *node, SymbolTable *table) {
+    if (!node || node->type != NBlock) {
+        semanticError(node ? node->lineno : 0, "Expected block node");
+        return;
+    }
+
+    TreeNode *stmt = node->children[0]; // stmt_list
+    while (stmt) {
+        checkProgram(stmt, table);
+        stmt = stmt->sibling;
+    }
+}
+
+void checkAssignment(TreeNode *node, SymbolTable *table) {
+    if (!node || (node->type != NAssign && node->type != NAssignStmt)) {
+        semanticError(node ? node->lineno : 0, "Expected assignment node");
+        return;
+    }
+
+    TreeNode *lhs = node->children[0];
+    TreeNode *rhs = node->children[1];
+
+    if (!lhs || lhs->type != NIdentifier) {
+        semanticError(node->lineno, "Assignment left-hand side must be an identifier");
+        return;
+    }
+    Symbol *sym = lookup(table, lhs->attribute.name);
+    if (!sym) {
+        semanticError(lhs->lineno, "Undeclared variable '%s'", lhs->attribute.name);
+        return;
+    }
+    if (rhs) {
+        checkExpression(rhs, table);
+    
+        int lhsType = sym->dataType;
+        int rhsType = getExpressionType(rhs, table);
+        checkTypeCompatibility(lhsType, rhsType, node->lineno, "assignment");
+    }
+}
+
+void checkIfStatement(TreeNode *node, SymbolTable *table) {
+    if (!node || node->type != NIfStmt) {
+        semanticError(node ? node->lineno : 0, "Expected if statement node");
+        return;
+    }
+
+
+    TreeNode *cond = node->children[0];
+    if (cond) {
+        checkExpression(cond, table);
+        int condType = getExpressionType(cond, table);
+        if (condType != INT) {
+            semanticError(cond->lineno, "If condition must be of type int");
+        }
+    }
+
+    TreeNode *thenClause = node->children[1];
+    if (thenClause) {
+        enterScope(table);
+        checkProgram(thenClause, table);
+        exitScope(table);
+    }
+
+    TreeNode *elseClause = node->children[2];
+    if (elseClause) {
+        enterScope(table);
+        checkProgram(elseClause, table);
+        exitScope(table);
+    }
+}
+
+void checkWhileStatement(TreeNode *node, SymbolTable *table) {
+    if (!node || node->type != NWhileStmt) {
+        semanticError(node ? node->lineno : 0, "Expected while statement node");
+        return;
+    }
+
+    TreeNode *cond = node->children[0];
+    if (cond) {
+        checkExpression(cond, table);
+        int condType = getExpressionType(cond, table);
+        if (condType != INT) {
+            semanticError(cond->lineno, "While condition must be of type int");
+        }
+    }
+
+    TreeNode *body = node->children[1];
+    if (body) {
+        enterScope(table);
+        checkProgram(body, table);
+        exitScope(table);
+    }
+}
+
+void checkReturnStatement(TreeNode *node, SymbolTable *table) {
+    if (!node || node->type != NReturnStmt) {
+        semanticError(node ? node->lineno : 0, "Expected return statement node");
+        return;
+    }
+
+    TreeNode *expr = node->children[0];
+    if (expr) {
+        checkExpression(expr, table);
+    }
+}
+
 
 void checkDeclaration(TreeNode *node, SymbolTable *table) {
     if (!node || node->type != NDeclaration) {

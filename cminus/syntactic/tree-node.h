@@ -4,8 +4,12 @@
 #define MAX_CHILDREN 3
 
 typedef enum {
-    NProgram, NCmdList, NCmd, NAssignStmt, NIdentifier, NExpr, NOperator, 
-    NNumber, NIfStmt, NWhileStmt, NReturnStmt, NCompoundStmt, NStatement, NDeclaration, NCall
+    NProgram, NCmdList, NCmd,
+     NAssignStmt,     NIdentifier, NExpr, 
+    NOperator, NNumber, NIfStmt,
+     NWhileStmt,     NReturnStmt, NCompoundStmt,   
+     NStatement,      NDeclaration, NCall, 
+      NBlock,       NAssign, NType
 } NodeType;
 
 typedef struct treeNode {
@@ -22,6 +26,7 @@ typedef struct treeNode {
 } TreeNode;
 
 TreeNode * newTreeNode(NodeType type, int lineno);
+void freeTree(TreeNode *node);
 extern TreeNode *rootNode;  // Global syntax tree root
 
 #endif

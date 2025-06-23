@@ -19,4 +19,22 @@ TreeNode * newTreeNode(NodeType type, int lineno) {
     return node;
 }
 
+void freeTree(TreeNode *node) {
+    if (!node) return;
+    
+    for (int i = 0; i < MAX_CHILDREN; i++) {
+        freeTree(node->children[i]);
+    }
+    freeTree(node->sibling);
+    
+    if (node->type == NIdentifier && node->attribute.name) {
+        free(node->attribute.name);
+    }
+    free(node);
+}
+
+
+// TreeNode * newTreeNode(NodeType type, int lineno);
+// extern TreeNode *rootNode;  // Global syntax tree root
+
 TreeNode *rootNode = NULL;  // Definition of global root node
