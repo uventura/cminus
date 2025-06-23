@@ -4,11 +4,25 @@
 #include "../syntactic/tree-node.h"
 #include "symbol-table.h"
 
+// Main semantic analysis function
 void semanticAnalysis(TreeNode *syntaxTree);
-void checkNode(TreeNode *node, SymbolTable *table);
-void checkVariable(TreeNode *node, SymbolTable *table);
-void checkFunction(TreeNode *node, SymbolTable *table);
-void checkExpression(TreeNode *node, SymbolTable *table);
+
+// Node checking functions
+void checkProgram(TreeNode *node, SymbolTable *table);
+void checkDeclaration(TreeNode *node, SymbolTable *table);
 void checkStatement(TreeNode *node, SymbolTable *table);
+void checkExpression(TreeNode *node, SymbolTable *table);
+
+// Type checking functions
+int getExpressionType(TreeNode *expr, SymbolTable *table);
+void checkTypeCompatibility(int expected, int actual, int lineno, const char *context);
+
+// Utility functions
+void checkVariableDeclaration(TreeNode *node, SymbolTable *table);
+void checkFunctionDeclaration(TreeNode *node, SymbolTable *table);
+void checkFunctionCall(TreeNode *node, SymbolTable *table);
+
+// Error reporting
+void semanticError(int lineno, const char *format, ...);
 
 #endif

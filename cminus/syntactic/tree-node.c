@@ -18,20 +18,5 @@ TreeNode * newTreeNode(NodeType type, int lineno) {
     node->sibling = NULL;
     return node;
 }
-// {
-//     TreeNode * t = (TreeNode *) malloc(sizeof(TreeNode));
-//     if (t == NULL) {
-//         fprintf(stderr, "Out of memory\n");
-//         exit(EXIT_FAILURE);
-//     }
-
-//     for (int i = 0; i < MAX_CHILDREN; i++) {
-//         t->children[i] = NULL;
-//     }
-//     t->sibling = NULL;
-//     t->type = type;
-//     t->lineno = lineno;
-//     return t;
-// }
 
 TreeNode *rootNode = NULL;  // Definition of global root node

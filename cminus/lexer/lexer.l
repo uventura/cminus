@@ -1,6 +1,7 @@
 %{
 #include "utils/debug.h"
 #include "syntactic/syntactic.tab.h"
+#include <string.h>  // Add for strcmp()
 %}
 
 %option noyywrap
@@ -10,9 +11,11 @@ LETTER_T      [a-zA-Z]
 ID_T  {LETTER_T}+
 DIGIT_EXPR       [0-9]
 NUMBER_T      {DIGIT_EXPR}+
-KEYWORDS_T    else|if|int|return|void|while
+KEYWORDS_T    "else"|"if"|"int"|"return"|"void"|"while" 
 ANY_EXPR .|\n
 SPECIAL_T "+"|"-"|"*"|"/"|"<"|"<="|">"|">="|"=="|"!="|"="|";"|","|"("|")"|"["|"]"|"{"|"}"
+
+
 
 %x COMMENT_STATE
 START_COMMENT   "/*"
@@ -38,8 +41,9 @@ END_COMMENT    "*/"
 {NUMBER_T} {
 #ifdef LEXER_MODE
     debug_print("[ %s \033[0;33m<Number>\033[0m ]", yytext);
-#endif
+#else
     return NUMBER;
+#endif
 }
 {KEYWORDS_T} {
 #ifdef LEXER_MODE

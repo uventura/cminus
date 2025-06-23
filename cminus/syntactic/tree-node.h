@@ -4,15 +4,15 @@
 #define MAX_CHILDREN 3
 
 typedef enum {
-    NProgram, NCmdList, NCmd, NAssign, NIdentifier, NExpr, NOperator, NNumber, NConditional
+    NProgram, NCmdList, NCmd, NAssignStmt, NIdentifier, NExpr, NOperator, 
+    NNumber, NIfStmt, NWhileStmt, NReturnStmt, NCompoundStmt, NStatement, NDeclaration, NCall
 } NodeType;
 
 typedef struct treeNode {
     NodeType type;
     struct treeNode* children[MAX_CHILDREN];
     struct treeNode* sibling;
-    union
-    {
+    union {
         char *name;
         int value;
         char op;

@@ -7,6 +7,7 @@
 #define YYSTYPE TreeNode*
 
 extern int lineno;
+extern TreeNode *rootNode;
 int yylex();
 void yyerror(char *s);
 %}
@@ -40,15 +41,14 @@ input: /* empty */
 line: program { printf("Program syntax is correct!\n"); }
 ;
 
-program: block
-;
 
-// program: block { 
-//     $$ = $1; 
-//     rootNode = $$;  // Set the root node here
-//     printf("Program syntax is correct!\n"); 
-// }
-// ;
+
+program: block { 
+    $$ = $1; 
+    rootNode = $$;
+    printf("Setting root node at %p\n", (void*)rootNode);
+    printf("Program syntax is correct!\n"); 
+}
 
 
 block: OPEN_BRACES stmt_list CLOSE_BRACES
@@ -91,10 +91,10 @@ expr: expr MULTIPLY expr
 
 int main() 
 {
-
     rootNode = NULL;  // Initialize rootNode
     
-	yyparse();
+    yyparse();
+    printf("Root node after parse: %p\n", (void*)rootNode);
     
     if (rootNode) {
         semanticAnalysis(rootNode);
@@ -105,6 +105,7 @@ int main()
 
     return 0;
 }
+
 
 void yyerror(char *s)
 {

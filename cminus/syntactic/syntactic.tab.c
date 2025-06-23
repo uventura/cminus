@@ -77,10 +77,11 @@
 #define YYSTYPE TreeNode*
 
 extern int lineno;
+extern TreeNode *rootNode;
 int yylex();
 void yyerror(char *s);
 
-#line 84 "cminus/syntactic/syntactic.tab.c"
+#line 85 "cminus/syntactic/syntactic.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -538,7 +539,7 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    36,    36,    37,    40,    43,    54,    57,    58,    61,
+       0,    37,    37,    38,    41,    46,    54,    57,    58,    61,
       62,    65,    68,    69,    70,    73,    76,    77,    78,    79,
       80,    81,    82,    83,    84,    85,    86,    87
 };
@@ -1137,13 +1138,24 @@ yyreduce:
   switch (yyn)
     {
   case 4: /* line: program  */
-#line 40 "cminus/syntactic/syntactic.y"
+#line 41 "cminus/syntactic/syntactic.y"
               { printf("Program syntax is correct!\n"); }
-#line 1143 "cminus/syntactic/syntactic.tab.c"
+#line 1144 "cminus/syntactic/syntactic.tab.c"
+    break;
+
+  case 5: /* program: block  */
+#line 46 "cminus/syntactic/syntactic.y"
+               { 
+    yyval = yyvsp[0]; 
+    rootNode = yyval;
+    printf("Setting root node at %p\n", (void*)rootNode);
+    printf("Program syntax is correct!\n"); 
+}
+#line 1155 "cminus/syntactic/syntactic.tab.c"
     break;
 
 
-#line 1147 "cminus/syntactic/syntactic.tab.c"
+#line 1159 "cminus/syntactic/syntactic.tab.c"
 
       default: break;
     }
@@ -1341,10 +1353,10 @@ yyreturnlab:
 
 int main() 
 {
-
     rootNode = NULL;  // Initialize rootNode
     
-	yyparse();
+    yyparse();
+    printf("Root node after parse: %p\n", (void*)rootNode);
     
     if (rootNode) {
         semanticAnalysis(rootNode);
@@ -1355,6 +1367,7 @@ int main()
 
     return 0;
 }
+
 
 void yyerror(char *s)
 {
