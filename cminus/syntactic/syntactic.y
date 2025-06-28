@@ -14,14 +14,16 @@ int yylex();
 void yyerror(char *s);
 %}
 
+/* Forward declaration for Bison */
 %union {
-    TreeNode* node;
+    struct treeNode* node;
     int num_value;
-    char* str_value;
+    char* cadeia;
 }
 
+
 %token <num_value> NUMBER
-%token <str_value> ID
+%token <cadeia> ID
 %type <node> expr simple_stmt compound_stmt stmt stmt_list block program declaration type_specifier identifier
 
 %token MULTIPLY DIVIDE SEMICOLON
@@ -146,7 +148,15 @@ compound_stmt:
 identifier:
     ID {
         $$ = newTreeNode(NIdentifier, yylineno);
+        if ($1 == NULL) {
+            yyerror("Identifier name is NULL");
+            YYERROR;
+        }
         $$->attribute.name = strdup($1);
+        if ($$->attribute.name == NULL) {
+            yyerror("Memory allocation failed for identifier name");
+            YYERROR;
+        }
     }
 ;
 

@@ -90,11 +90,11 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 17 "cminus/syntactic/syntactic.y"
+#line 18 "cminus/syntactic/syntactic.y"
 
-    TreeNode* node;
+    struct treeNode* node;
     int num_value;
-    char* str_value;
+    char* cadeia;
 
 #line 100 "cminus/syntactic/syntactic.tab.h"
 

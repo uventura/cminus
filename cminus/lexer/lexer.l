@@ -1,5 +1,5 @@
 %{
-#include "../syntactic/tree-node.h"
+#include "syntactic/tree-node.h"
 #include "utils/debug.h"
 #include "syntactic/syntactic.tab.h"
 #include <string.h> 
@@ -64,6 +64,7 @@ END_COMMENT    "*/"
 #ifdef LEXER_MODE
     debug_print("[ %s \033[0;33m<Identifier>\033[0m ]", yytext);
 #endif
+    yylval.cadeia = strdup(yytext);  // Set the semantic value
     return ID;
 }
 
