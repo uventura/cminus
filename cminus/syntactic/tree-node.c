@@ -33,6 +33,15 @@ void freeTree(TreeNode *node) {
     free(node);
 }
 
+TreeNode *newBinaryNode(NodeType type, TreeNode *left, TreeNode *right, int lineno) {
+    TreeNode *node = newTreeNode(type, lineno);
+    if (node) {
+        node->children[0] = left;
+        node->children[1] = right;
+    }
+    return node;
+}
+
 
 // TreeNode * newTreeNode(NodeType type, int lineno);
 // extern TreeNode *rootNode;  // Global syntax tree root

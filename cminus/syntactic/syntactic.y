@@ -1,12 +1,10 @@
 //must set $$ in every rule that returns a TreeNode*
 %{
+#include "tree-node.h"
+#include "../semantic/semantic.h" 
 #include <stdio.h> 
 #include <stdlib.h>
-#include "tree-node.h"
 #include <string.h> 
-#include "../semantic/semantic.h" 
-
-#define YYSTYPE TreeNode*
 
 extern int lineno;
 extern int yylineno;
@@ -16,7 +14,16 @@ int yylex();
 void yyerror(char *s);
 %}
 
-%token ID NUMBER
+%union {
+    TreeNode* node;
+    int num_value;
+    char* str_value;
+}
+
+%token <num_value> NUMBER
+%token <str_value> ID
+%type <node> expr simple_stmt compound_stmt stmt stmt_list block program declaration type_specifier identifier
+
 %token MULTIPLY DIVIDE SEMICOLON
 %token OPEN_BRACES CLOSE_BRACES
 %token LESS LESS_EQUAL GREATER GREATER_EQUAL
@@ -32,7 +39,6 @@ void yyerror(char *s);
 %nonassoc LESS LESS_EQUAL GREATER GREATER_EQUAL
 %nonassoc EQUAL NOT_EQUAL
 
-
 %nonassoc LOWER_THAN_ELSE
 %nonassoc ELSE
 
@@ -43,7 +49,6 @@ input:
   | input line
   | error { yyerror("Invalid input"); yyclearin; }
 ;
-
 
 line: program { printf("Program syntax is correct!\n"); }
 ;
@@ -61,17 +66,20 @@ program: block {
     rootNode = $$;
     printf("Root node set to %p\n", (void*)rootNode);
 }
+;
 
 block: OPEN_BRACES stmt_list CLOSE_BRACES {
     $$ = newTreeNode(NBlock, yylineno);
     $$->children[0] = $2;  // stmt_list
 }
+;
 
 declaration: type_specifier identifier SEMICOLON {
     $$ = newTreeNode(NDeclaration, yylineno);
     $$->children[0] = $1;  // type (INT/VOID)
     $$->children[1] = $2;  // identifier (e.g., "a")
-};
+}
+;
 
 type_specifier:
     INT {
@@ -83,7 +91,6 @@ type_specifier:
         $$->attribute.dataType = VOID;
     }
 ;
-
 
 stmt_list:
     stmt stmt_list {
@@ -119,31 +126,46 @@ simple_stmt:
     }
 ;
 
-compound_stmt: IF OPEN_PARENTHESIS expr CLOSE_PARENTHESIS stmt %prec LOWER_THAN_ELSE
-             | IF OPEN_PARENTHESIS expr CLOSE_PARENTHESIS stmt ELSE stmt
-             | block
+compound_stmt: 
+    IF OPEN_PARENTHESIS expr CLOSE_PARENTHESIS stmt %prec LOWER_THAN_ELSE {
+        $$ = newTreeNode(NIfStmt, yylineno);
+        $$->children[0] = $3; // condition (expr)
+        $$->children[1] = $5; // then-part (stmt)
+    }
+    | IF OPEN_PARENTHESIS expr CLOSE_PARENTHESIS stmt ELSE stmt {
+        $$ = newTreeNode(NIfElseStmt, yylineno);
+        $$->children[0] = $3; // condition (expr)
+        $$->children[1] = $5; // then-part (stmt)
+        $$->children[2] = $7; // else-part (stmt)
+    }
+    | block {
+        $$ = $1; // block already returns a TreeNode*
+    }
 ;
 
 identifier:
     ID {
         $$ = newTreeNode(NIdentifier, yylineno);
-        $$->attribute.name = strdup(yytext);
+        $$->attribute.name = strdup($1);
     }
 ;
 
-
-expr: expr MULTIPLY expr
-    | expr DIVIDE expr
-    | expr PLUS expr
-    | expr MINUS expr
-    | expr LESS expr
-    | expr LESS_EQUAL expr
-    | expr GREATER expr
-    | expr GREATER_EQUAL expr
-    | expr EQUAL expr
-    | expr NOT_EQUAL expr
-    | identifier
-    | NUMBER
+expr: 
+    expr MULTIPLY expr { $$ = newBinaryNode(NMultiply, $1, $3, yylineno); }
+    | expr DIVIDE expr { $$ = newBinaryNode(NDivide, $1, $3, yylineno); }
+    | expr PLUS expr { $$ = newBinaryNode(NPlus, $1, $3, yylineno); }
+    | expr MINUS expr { $$ = newBinaryNode(NMinus, $1, $3, yylineno); }
+    | expr LESS expr { $$ = newBinaryNode(NLess, $1, $3, yylineno); }
+    | expr LESS_EQUAL expr { $$ = newBinaryNode(NLessEqual, $1, $3, yylineno); }
+    | expr GREATER expr { $$ = newBinaryNode(NGreater, $1, $3, yylineno); }
+    | expr GREATER_EQUAL expr { $$ = newBinaryNode(NGreaterEqual, $1, $3, yylineno); }
+    | expr EQUAL expr { $$ = newBinaryNode(NEqual, $1, $3, yylineno); }
+    | expr NOT_EQUAL expr { $$ = newBinaryNode(NNotEqual, $1, $3, yylineno); }
+    | identifier { $$ = $1; }
+    | NUMBER { 
+        $$ = newTreeNode(NNumber, yylineno); 
+        $$->attribute.value = $1;
+    }
 ;
 
 %%
@@ -165,7 +187,6 @@ int main()
 
     return 0;
 }
-
 
 void yyerror(char *s)
 {

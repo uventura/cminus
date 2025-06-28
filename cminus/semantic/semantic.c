@@ -8,6 +8,18 @@
 // Global flag to track if any semantic errors were found
 static int hasSemanticErrors = 0;
 
+void printSymbolTable(SymbolTable *table) {
+    printf("\tDEBUG: Symbol Table (scope %d):\n", table->currentScope);
+    Symbol *current = table->head;
+    while (current) {
+        printf("\t  %s: %s (scope %d)\n", 
+               current->name, 
+               current->type == VAR ? "var" : "func",
+               current->scope);
+        current = current->next;
+    }
+}
+
 void semanticError(int lineno, const char *format, ...) {
     va_list args;
     va_start(args, format);
@@ -171,18 +183,6 @@ void checkProgram(TreeNode *node, SymbolTable *table) {
     }
     
     exitScope(table);
-}
-
-void printSymbolTable(SymbolTable *table) {
-    printf("\tDEBUG: Symbol Table (scope %d):\n", table->currentScope);
-    Symbol *current = table->head;
-    while (current) {
-        printf("\t  %s: %s (scope %d)\n", 
-               current->name, 
-               current->type == VAR ? "var" : "func",
-               current->scope);
-        current = current->next;
-    }
 }
 
 void checkBlock(TreeNode *node, SymbolTable *table) {

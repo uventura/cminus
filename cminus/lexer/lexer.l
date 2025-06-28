@@ -1,7 +1,8 @@
 %{
+#include "../syntactic/tree-node.h"
 #include "utils/debug.h"
 #include "syntactic/syntactic.tab.h"
-#include <string.h>  // Add for strcmp()
+#include <string.h> 
 %}
 
 %option noyywrap

@@ -54,8 +54,8 @@ extern int yydebug;
     YYEOF = 0,                     /* "end of file"  */
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
-    ID = 258,                      /* ID  */
-    NUMBER = 259,                  /* NUMBER  */
+    NUMBER = 258,                  /* NUMBER  */
+    ID = 259,                      /* ID  */
     MULTIPLY = 260,                /* MULTIPLY  */
     DIVIDE = 261,                  /* DIVIDE  */
     SEMICOLON = 262,               /* SEMICOLON  */
@@ -88,7 +88,18 @@ extern int yydebug;
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef int YYSTYPE;
+union YYSTYPE
+{
+#line 17 "cminus/syntactic/syntactic.y"
+
+    TreeNode* node;
+    int num_value;
+    char* str_value;
+
+#line 100 "cminus/syntactic/syntactic.tab.h"
+
+};
+typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif
