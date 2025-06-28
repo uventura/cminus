@@ -6,9 +6,7 @@
 %}
 
 %option noyywrap
-
-extern int yylineno;
-int yylineno = 1;  
+%option yylineno
 
 WHITESPACE_T  [ \t]
 LETTER_T      [a-zA-Z]
@@ -106,7 +104,7 @@ END_COMMENT    "*/"
 #ifdef LEXER_MODE
     debug_print("[ \\n \033[0;33m<Newline>\033[0m ]");
 #endif
-    // ignore return '\n';
+    // This will be handled automatically by %option yylineno
 }
 
 [^\n]   { debug_print("[ %s \033[0;31m<undefined>\033[0m ]", yytext);}

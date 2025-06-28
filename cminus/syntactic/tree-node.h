@@ -15,19 +15,6 @@ typedef enum {
     NNotEqual
 } NodeType;
 
-// typedef struct treeNode {
-//     NodeType type;
-//     struct treeNode* children[MAX_CHILDREN];
-//     struct treeNode* sibling;
-//     union {
-//         char *name;
-//         int value;
-//         char op;
-//         int dataType;   // For type information (INT/VOID)
-//     } attribute;
-//     int lineno;    
-// } TreeNode;
-
 typedef enum {
     TYPE_INT,   
     TYPE_VOID,
@@ -35,10 +22,13 @@ typedef enum {
 } DataType;
 
 typedef struct attribute {
-    char *name;
-    int value;
-    char op;
-    DataType dataType;  // Now uses the enum
+    union
+    {
+        char *name;
+        int value;
+        char op;
+    } val;
+    DataType dataType; 
     int lineno;
     int wasUsed;
 } attribute;
@@ -48,9 +38,15 @@ typedef struct treeNode {
     NodeType type;
     struct treeNode* children[MAX_CHILDREN];
     struct treeNode* sibling;
-    
-    attribute  attribute;
+    union
+    {
+        char *name;
+        int value;
+        char op;
+    } attribute;
+    DataType dataType;
     int lineno;
+    int wasUsed;
 } TreeNode;
 
 

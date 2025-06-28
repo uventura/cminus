@@ -57,6 +57,7 @@ line: program { printf("Program syntax is correct!\n"); }
 
 program: block { 
     printf("Program node creation\n");
+    $$ = newTreeNode(NProgram, @$.first_line);
     if ($1 == NULL) {
         printf("!! Block is NULL!\n");
     } 
@@ -81,19 +82,19 @@ declaration: type_specifier identifier SEMICOLON {
     $$->children[0] = $1;  // type (INT/VOID)
     $$->children[1] = $2;  // identifier (e.g., "a")
     // Ensure type is properly set in the identifier
-    $2->attribute.dataType = $1->attribute.dataType;
+    $2->dataType = $1->dataType;
     printf("DECLARATION: Set type %d for identifier %s\n", 
-           $1->attribute.dataType, $2->attribute.name);
+           $1->dataType, $2->attribute.name);
 }
 
 type_specifier:
     INT {
         $$ = newTreeNode(NType, yylineno);
-        $$->attribute.dataType = TYPE_INT;  // Use consistent type value
+        $$->dataType = TYPE_INT;  // Use consistent type value
     }
   | VOID {
         $$ = newTreeNode(NType, yylineno);
-        $$->attribute.dataType = TYPE_VOID;
+        $$->dataType = TYPE_VOID;
     }
 ;
 
@@ -162,7 +163,7 @@ identifier:
             YYERROR;
         }
         // Initialize dataType to some default (will be overwritten by declaration)
-        $$->attribute.dataType = -1; 
+        $$->dataType = -1; 
         printf("PARSER: Set node name to %p\n", $$->attribute.name);  // Debug
     }
 ;

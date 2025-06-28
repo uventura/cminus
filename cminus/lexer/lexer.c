@@ -163,8 +163,27 @@ extern FILE *yyin, *yyout;
 #define EOB_ACT_END_OF_FILE 1
 #define EOB_ACT_LAST_MATCH 2
     
-    #define YY_LESS_LINENO(n)
-    #define YY_LINENO_REWIND_TO(ptr)
+    /* Note: We specifically omit the test for yy_rule_can_match_eol because it requires
+     *       access to the local variable yy_act. Since yyless() is a macro, it would break
+     *       existing scanners that call yyless() from OUTSIDE yylex.
+     *       One obvious solution it to make yy_act a global. I tried that, and saw
+     *       a 5% performance hit in a non-yylineno scanner, because yy_act is
+     *       normally declared as a register variable-- so it is not worth it.
+     */
+    #define  YY_LESS_LINENO(n) \
+            do { \
+                int yyl;\
+                for ( yyl = n; yyl < yyleng; ++yyl )\
+                    if ( yytext[yyl] == '\n' )\
+                        --yylineno;\
+            }while(0)
+    #define YY_LINENO_REWIND_TO(dst) \
+            do {\
+                const char *p;\
+                for ( p = yy_cp-1; p >= (dst); --p)\
+                    if ( *p == '\n' )\
+                        --yylineno;\
+            }while(0)
     
 /* Return all but the first "n" matched characters back to the input stream. */
 #define yyless(n) \
@@ -463,6 +482,11 @@ static const flex_int16_t yy_chk[106] =
        45,   45,   45,   45,   45
     } ;
 
+/* Table of booleans, true if rule could match eol. */
+static const flex_int32_t yy_rule_can_match_eol[12] =
+    {   0,
+0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0,     };
+
 static yy_state_type yy_last_accepting_state;
 static char *yy_last_accepting_cpos;
 
@@ -483,9 +507,9 @@ char *yytext;
 #include "utils/debug.h"
 #include "syntactic/syntactic.tab.h"
 #include <string.h> 
-#line 487 "cminus/lexer/lexer.c"
+#line 511 "cminus/lexer/lexer.c"
 
-#line 489 "cminus/lexer/lexer.c"
+#line 513 "cminus/lexer/lexer.c"
 
 #define INITIAL 0
 #define COMMENT_STATE 1
@@ -704,10 +728,10 @@ YY_DECL
 		}
 
 	{
-#line 29 "cminus/lexer/lexer.l"
+#line 27 "cminus/lexer/lexer.l"
 
 
-#line 711 "cminus/lexer/lexer.c"
+#line 735 "cminus/lexer/lexer.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -753,6 +777,16 @@ yy_find_action:
 
 		YY_DO_BEFORE_ACTION;
 
+		if ( yy_act != YY_END_OF_BUFFER && yy_rule_can_match_eol[yy_act] )
+			{
+			int yyl;
+			for ( yyl = 0; yyl < yyleng; ++yyl )
+				if ( yytext[yyl] == '\n' )
+					
+    yylineno++;
+;
+			}
+
 do_action:	/* This label is used only to access EOF actions. */
 
 		switch ( yy_act )
@@ -766,7 +800,7 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 31 "cminus/lexer/lexer.l"
+#line 29 "cminus/lexer/lexer.l"
 {
     BEGIN(COMMENT_STATE);
 }
@@ -774,7 +808,7 @@ YY_RULE_SETUP
 
 case 2:
 YY_RULE_SETUP
-#line 35 "cminus/lexer/lexer.l"
+#line 33 "cminus/lexer/lexer.l"
 {
         debug_comment(yytext, 0);
         BEGIN(INITIAL);
@@ -783,7 +817,7 @@ YY_RULE_SETUP
 case 3:
 /* rule 3 can match eol */
 YY_RULE_SETUP
-#line 39 "cminus/lexer/lexer.l"
+#line 37 "cminus/lexer/lexer.l"
 {
         debug_comment(yytext, 1);
     }
@@ -791,7 +825,7 @@ YY_RULE_SETUP
 
 case 4:
 YY_RULE_SETUP
-#line 44 "cminus/lexer/lexer.l"
+#line 42 "cminus/lexer/lexer.l"
 {
 #ifdef LEXER_MODE
     debug_print("[ %s \033[0;33m<Number>\033[0m ]", yytext);
@@ -802,7 +836,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 51 "cminus/lexer/lexer.l"
+#line 49 "cminus/lexer/lexer.l"
 {
 #ifdef LEXER_MODE
     debug_print("[ %s \033[0;33m<Keyword>\033[0m ]", yytext);
@@ -817,7 +851,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 63 "cminus/lexer/lexer.l"
+#line 61 "cminus/lexer/lexer.l"
 {
 #ifdef LEXER_MODE
     debug_print("[ %s \033[0;33m<Identifier>\033[0m ]", yytext);
@@ -830,7 +864,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 73 "cminus/lexer/lexer.l"
+#line 71 "cminus/lexer/lexer.l"
 {
 #ifdef LEXER_MODE
     debug_print("[ %s \033[0;33m<WhiteSpace>\033[0m ]", yytext);
@@ -840,7 +874,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 80 "cminus/lexer/lexer.l"
+#line 78 "cminus/lexer/lexer.l"
 {
 #ifdef LEXER_MODE
     debug_print("[ %s \033[0;33m<Special>\033[0m ]", yytext);
@@ -869,25 +903,25 @@ YY_RULE_SETUP
 case 9:
 /* rule 9 can match eol */
 YY_RULE_SETUP
-#line 105 "cminus/lexer/lexer.l"
+#line 103 "cminus/lexer/lexer.l"
 {
 #ifdef LEXER_MODE
     debug_print("[ \\n \033[0;33m<Newline>\033[0m ]");
 #endif
-    // ignore return '\n';
+    // This will be handled automatically by %option yylineno
 }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 112 "cminus/lexer/lexer.l"
+#line 110 "cminus/lexer/lexer.l"
 { debug_print("[ %s \033[0;31m<undefined>\033[0m ]", yytext);}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 113 "cminus/lexer/lexer.l"
+#line 111 "cminus/lexer/lexer.l"
 ECHO;
 	YY_BREAK
-#line 891 "cminus/lexer/lexer.c"
+#line 925 "cminus/lexer/lexer.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(COMMENT_STATE):
 case YY_STATE_EOF(LEXING_ERROR):
@@ -1257,6 +1291,10 @@ static int yy_get_next_buffer (void)
 
 	*--yy_cp = (char) c;
 
+    if ( c == '\n' ){
+        --yylineno;
+    }
+
 	(yytext_ptr) = yy_bp;
 	(yy_hold_char) = *yy_cp;
 	(yy_c_buf_p) = yy_cp;
@@ -1333,6 +1371,11 @@ static int yy_get_next_buffer (void)
 	c = *(unsigned char *) (yy_c_buf_p);	/* cast for 8-bit char's */
 	*(yy_c_buf_p) = '\0';	/* preserve yytext */
 	(yy_hold_char) = *++(yy_c_buf_p);
+
+	if ( c == '\n' )
+		
+    yylineno++;
+;
 
 	return c;
 }
@@ -1800,6 +1843,9 @@ static int yy_init_globals (void)
      * This function is called from yylex_destroy(), so don't allocate here.
      */
 
+    /* We do not touch yylineno unless the option is enabled. */
+    yylineno =  1;
+    
     (yy_buffer_stack) = NULL;
     (yy_buffer_stack_top) = 0;
     (yy_buffer_stack_max) = 0;
@@ -1894,7 +1940,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 113 "cminus/lexer/lexer.l"
+#line 111 "cminus/lexer/lexer.l"
 
 
 #ifdef LEXER_MODE

@@ -313,11 +313,11 @@ void checkDeclaration(TreeNode *node, SymbolTable *table) {
         return;
     }
 
-    int dataType = typeNode->attribute.dataType;
+    int dataType = typeNode->dataType;
     const char *name = idNode->attribute.name;
 
     // Propagate type to identifier node
-    idNode->attribute.dataType = dataType;
+    idNode->dataType = dataType;
     printf("DEBUG: Setting type %d for identifier %s\n", dataType, name);
 
     Symbol *existing = lookup(table, name);
