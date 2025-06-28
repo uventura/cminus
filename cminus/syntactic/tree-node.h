@@ -15,10 +15,6 @@ typedef enum {
     NNotEqual
 } NodeType;
 
-typedef enum {
-    TYPE_INT, TYPE_VOID
-} TypeT;
-
 // typedef struct treeNode {
 //     NodeType type;
 //     struct treeNode* children[MAX_CHILDREN];
@@ -32,12 +28,21 @@ typedef enum {
 //     int lineno;    
 // } TreeNode;
 
-typedef struct attribute {char *name;        // for identifiers
-    int value;         // for numbers
-    char op;           // if you need it
-    int dataType;      // INT or VOID
+typedef enum {
+    TYPE_INT,   
+    TYPE_VOID,
+    TYPE_ERROR  // 2 (for invalid types)
+} DataType;
+
+typedef struct attribute {
+    char *name;
+    int value;
+    char op;
+    DataType dataType;  // Now uses the enum
     int lineno;
-    int wasUsed;     } attribute;
+    int wasUsed;
+} attribute;
+
 
 typedef struct treeNode {
     NodeType type;

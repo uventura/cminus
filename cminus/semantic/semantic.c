@@ -5,25 +5,34 @@
 #include "semantic.h"
 #include "../lexer/tokens.h"
 
-#define TYPE_INT  0
-#define TYPE_VOID  1
-
 
 // Global flag to track if any semantic errors were found
 static int hasSemanticErrors = 0;
+
+
+const char* typeToString(DataType type) {
+    switch(type) {
+        case TYPE_INT:  return "int";
+        case TYPE_VOID: return "void";
+        case TYPE_ERROR: return "error";
+        default: return "unknown";
+    }
+}
+
 
 void printSymbolTable(SymbolTable *table) {
     printf("\tDEBUG: Symbol Table (scope %d):\n", table->currentScope);
     Symbol *current = table->head;
     while (current) {
         printf("\t  %s: %s (scope %d, type: %s)\n", 
-               current->name, 
-               current->type == VAR ? "var" : "func",
-               current->scope,
-               current->dataType == INT ? "int" : "void");
+            current->name, 
+            current->type == VAR ? "var" : "func",
+            current->scope,
+            typeToString(current->dataType));
         current = current->next;
     }
 }
+    
 
 void semanticError(int lineno, const char *format, ...) {
     va_list args;
@@ -221,22 +230,26 @@ void checkAssignment(TreeNode *node, SymbolTable *table) {
     if (rhs) {
         checkExpression(rhs, table);
     
-        int lhsType = sym->dataType;
-        int rhsType = getExpressionType(rhs, table);
+        DataType lhsType = sym->dataType;
+        DataType rhsType = getExpressionType(rhs, table);
         
-        printf("DEBUG: Assignment type check - lhs: %s (%d), rhs: %d\n",
-               lhs->attribute.name, lhsType, rhsType);
+        printf("DEBUG: Assignment type check - lhs: %s (%s), rhs: %s\n",
+               lhs->attribute.name, 
+               typeToString(lhsType),
+               typeToString(rhsType));
         
         if (lhsType == TYPE_INT && rhsType == TYPE_INT) {
-            return; // Valid assignment
+            return;  // Valid assignment
         }
         
-        if (lhsType == VOID) {
+        if (lhsType == TYPE_VOID) {
             semanticError(lhs->lineno, "Cannot assign to void variable '%s'", lhs->attribute.name);
         } else {
-            semanticError(node->lineno, "Type mismatch in assignment: expected %d, got %d ",
-                lhsType, 
-                rhsType );
+            semanticError(node->lineno, 
+                "Type mismatch in assignment to '%s': expected %s, got %s",
+                lhs->attribute.name,
+                typeToString(lhsType),
+                typeToString(rhsType));
         }
     }
 }
@@ -413,10 +426,11 @@ void checkFunctionCall(TreeNode *node, SymbolTable *table) {
     }
 }
 
-int getExpressionType(TreeNode *expr, SymbolTable *table) {
+DataType getExpressionType(TreeNode *expr, SymbolTable *table) {
     if (!expr) {
-        printf("DEBUG: getExpressionType called with NULL expression\n"); // Debug
-        return TYPE_VOID;}
+        printf("DEBUG: getExpressionType called with NULL expression\n");
+        return TYPE_ERROR;
+    }
     
     switch (expr->type) {
         case NNumber:
@@ -424,29 +438,27 @@ int getExpressionType(TreeNode *expr, SymbolTable *table) {
             
         case NIdentifier: {
             Symbol *sym = lookup(table, expr->attribute.name);
-            if (!sym) {
-                return VOID;
-            }
-            return sym->dataType;
+            return sym ? sym->dataType : TYPE_ERROR;
         }
             
         case NPlus:
         case NMinus:
         case NMultiply:
         case NDivide:
-            return INT;
+            return TYPE_INT;
             
         default:
-            return VOID;
+            return TYPE_ERROR;
     }
 }
 
 
-void checkTypeCompatibility(int expected, int actual, int lineno, const char *context) {
+void checkTypeCompatibility(DataType expected, DataType actual, int lineno, const char *context) {
     if (expected != actual) {
-        semanticError(lineno, "Type mismatch in %s: expected %d, got %d",
-                     context,
-                     expected ,
-                     actual );
+        semanticError(lineno, 
+            "Type mismatch in %s: expected %s, got %s",
+            context,
+            typeToString(expected),
+            typeToString(actual));
     }
 }

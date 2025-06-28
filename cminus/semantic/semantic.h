@@ -20,8 +20,8 @@ void checkWhileStatement(TreeNode *node, SymbolTable *table);
 void checkReturnStatement(TreeNode *node, SymbolTable *table);
 
 // Type checking functions
-int getExpressionType(TreeNode *expr, SymbolTable *table);
-void checkTypeCompatibility(int expected, int actual, int lineno, const char *context);
+DataType getExpressionType(TreeNode *expr, SymbolTable *table);
+void checkTypeCompatibility(DataType expected, DataType actual, int lineno, const char *context);
 
 // Utility functions
 void checkVariableDeclaration(TreeNode *node, SymbolTable *table);
