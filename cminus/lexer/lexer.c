@@ -822,13 +822,15 @@ YY_RULE_SETUP
 #ifdef LEXER_MODE
     debug_print("[ %s \033[0;33m<Identifier>\033[0m ]", yytext);
 #endif
+
+    printf("LEXER: Found ID '%s'\n", yytext);  // Debug
     yylval.cadeia = strdup(yytext);  // Set the semantic value
     return ID;
 }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 71 "cminus/lexer/lexer.l"
+#line 73 "cminus/lexer/lexer.l"
 {
 #ifdef LEXER_MODE
     debug_print("[ %s \033[0;33m<WhiteSpace>\033[0m ]", yytext);
@@ -838,7 +840,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 78 "cminus/lexer/lexer.l"
+#line 80 "cminus/lexer/lexer.l"
 {
 #ifdef LEXER_MODE
     debug_print("[ %s \033[0;33m<Special>\033[0m ]", yytext);
@@ -867,7 +869,7 @@ YY_RULE_SETUP
 case 9:
 /* rule 9 can match eol */
 YY_RULE_SETUP
-#line 103 "cminus/lexer/lexer.l"
+#line 105 "cminus/lexer/lexer.l"
 {
 #ifdef LEXER_MODE
     debug_print("[ \\n \033[0;33m<Newline>\033[0m ]");
@@ -877,15 +879,15 @@ YY_RULE_SETUP
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 110 "cminus/lexer/lexer.l"
+#line 112 "cminus/lexer/lexer.l"
 { debug_print("[ %s \033[0;31m<undefined>\033[0m ]", yytext);}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 111 "cminus/lexer/lexer.l"
+#line 113 "cminus/lexer/lexer.l"
 ECHO;
 	YY_BREAK
-#line 889 "cminus/lexer/lexer.c"
+#line 891 "cminus/lexer/lexer.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(COMMENT_STATE):
 case YY_STATE_EOF(LEXING_ERROR):
@@ -1892,7 +1894,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 111 "cminus/lexer/lexer.l"
+#line 113 "cminus/lexer/lexer.l"
 
 
 #ifdef LEXER_MODE

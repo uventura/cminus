@@ -1,6 +1,5 @@
 #ifndef _TREE_H_
 #define _TREE_H_
-
 #define MAX_CHILDREN 3
 
 typedef enum {
@@ -16,18 +15,39 @@ typedef enum {
     NNotEqual
 } NodeType;
 
+typedef enum {
+    TYPE_INT, TYPE_VOID
+} TypeT;
+
+// typedef struct treeNode {
+//     NodeType type;
+//     struct treeNode* children[MAX_CHILDREN];
+//     struct treeNode* sibling;
+//     union {
+//         char *name;
+//         int value;
+//         char op;
+//         int dataType;   // For type information (INT/VOID)
+//     } attribute;
+//     int lineno;    
+// } TreeNode;
+
+typedef struct attribute {char *name;        // for identifiers
+    int value;         // for numbers
+    char op;           // if you need it
+    int dataType;      // INT or VOID
+    int lineno;
+    int wasUsed;     } attribute;
+
 typedef struct treeNode {
     NodeType type;
     struct treeNode* children[MAX_CHILDREN];
     struct treeNode* sibling;
-    union {
-        char *name;
-        int value;
-        char op;
-        int dataType;   // For type information (INT/VOID)
-    } attribute;
-    int lineno;    
+    
+    attribute  attribute;
+    int lineno;
 } TreeNode;
+
 
 
 TreeNode * newTreeNode(NodeType type, int lineno);

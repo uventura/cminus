@@ -52,20 +52,31 @@ Symbol* lookup(SymbolTable *table, const char *name) {
 }
 
 Symbol* insert(SymbolTable *table, const char *name, SymbolType type, int dataType) {
+    if (!table || table == NULL) {
+        fprintf(stderr, "Error: Symbol table is NULL\n");
+        return NULL;
+    } else if (table->currentScope < 0) {
+        fprintf(stderr, "Error: Invalid scope %d in symbol table\n", table->currentScope);
+        return NULL;
+    } else if (lookup(table, name) != NULL) {
+        fprintf(stderr, "Error: Symbol '%s' already exists in the current scope %d\n", name, table->currentScope);
+        return NULL;
+    } else if (name == NULL) {
+        fprintf(stderr, "Error: Attempt to insert an empty or NULL name into symbol table\n");
+        return NULL;
+    } 
+
     // printf("INSERTING: %s at scope %d\n", name, table->currentScope);  //# DEBUG
 
-    if (!table || !name) return NULL;
-    
-    // Check for redeclaration in current scope!
-    Symbol *existing = lookup(table, name);
-    if (existing && existing->scope == table->currentScope) {
+    if (name == NULL || strlen(name) == 0) {
+        fprintf(stderr, "Error: Attempt to insert NULL name into symbol table\n");
         return NULL;
     }
-    
-    Symbol *symbol = (Symbol*)malloc(sizeof(Symbol));
+
+    Symbol* symbol = malloc(sizeof(Symbol));
     if (!symbol) return NULL;
-    
-    symbol->name = strdup(name);
+
+    symbol->name = strdup(name);  // Now safe since we checked name
     if (!symbol->name) {
         free(symbol);
         return NULL;

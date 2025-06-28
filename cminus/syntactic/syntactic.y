@@ -80,17 +80,20 @@ declaration: type_specifier identifier SEMICOLON {
     $$ = newTreeNode(NDeclaration, yylineno);
     $$->children[0] = $1;  // type (INT/VOID)
     $$->children[1] = $2;  // identifier (e.g., "a")
+    // Ensure type is properly set in the identifier
+    $2->attribute.dataType = $1->attribute.dataType;
+    printf("DECLARATION: Set type %d for identifier %s\n", 
+           $1->attribute.dataType, $2->attribute.name);
 }
-;
 
 type_specifier:
     INT {
         $$ = newTreeNode(NType, yylineno);
-        $$->attribute.dataType = INT;
+        $$->attribute.dataType = TYPE_INT;  // Use consistent type value
     }
   | VOID {
         $$ = newTreeNode(NType, yylineno);
-        $$->attribute.dataType = VOID;
+        $$->attribute.dataType = TYPE_VOID;
     }
 ;
 
@@ -147,6 +150,7 @@ compound_stmt:
 
 identifier:
     ID {
+        printf("PARSER: Creating ID node from '%s' (pointer: %p)\n", $1, $1);  // Debug
         $$ = newTreeNode(NIdentifier, yylineno);
         if ($1 == NULL) {
             yyerror("Identifier name is NULL");
@@ -157,6 +161,9 @@ identifier:
             yyerror("Memory allocation failed for identifier name");
             YYERROR;
         }
+        // Initialize dataType to some default (will be overwritten by declaration)
+        $$->attribute.dataType = -1; 
+        printf("PARSER: Set node name to %p\n", $$->attribute.name);  // Debug
     }
 ;
 
