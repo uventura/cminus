@@ -19,6 +19,22 @@ const char* typeToString(DataType type) {
     }
 }
 
+static const char* getOperatorString(NodeType type) {
+    switch(type) {
+        case NPlus: return "+";
+        case NMinus: return "-";
+        case NMultiply: return "*";
+        case NDivide: return "/";
+        case NLess: return "<";
+        case NLessEqual: return "<=";
+        case NGreater: return ">";
+        case NGreaterEqual: return ">=";
+        case NEqual: return "==";
+        case NNotEqual: return "!=";
+        default: return "unknown";
+    }
+}
+
 
 void printSymbolTable(SymbolTable *table) {
     printf("\tDEBUG: Symbol Table (scope %d):\n", table->currentScope);
@@ -238,13 +254,7 @@ void checkAssignment(TreeNode *node, SymbolTable *table) {
                typeToString(lhsType),
                typeToString(rhsType));
         
-        if (lhsType == TYPE_INT && rhsType == TYPE_INT) {
-            return;  // Valid assignment
-        }
-        
-        if (lhsType == TYPE_VOID) {
-            semanticError(lhs->lineno, "Cannot assign to void variable '%s'", lhs->attribute.name);
-        } else {
+        if (lhsType != rhsType) {
             semanticError(node->lineno, 
                 "Type mismatch in assignment to '%s': expected %s, got %s",
                 lhs->attribute.name,
@@ -384,20 +394,39 @@ void checkExpression(TreeNode *node, SymbolTable *table) {
             }
             break;
             
-        case NCall:
-            checkFunctionCall(node, table);
+        case NNumber:
+            // Numbers are always valid
             break;
             
-        case NOperator:
+        case NPlus:
+        case NMinus:
+        case NMultiply:
+        case NDivide:
+        case NLess:
+        case NLessEqual:
+        case NGreater:
+        case NGreaterEqual:
+        case NEqual:
+        case NNotEqual:
+            // Check both operands
             if (node->children[0]) checkExpression(node->children[0], table);
             if (node->children[1]) checkExpression(node->children[1], table);
-            break;
             
-        case NNumber:
+            // Verify operand types are compatible
+            if (node->children[0] && node->children[1]) {
+                DataType leftType = getExpressionType(node->children[0], table);
+                DataType rightType = getExpressionType(node->children[1], table);
+                
+                if (leftType != TYPE_INT || rightType != TYPE_INT) {
+                    semanticError(node->lineno, 
+                        "Operands must be integers for operator '%s'",
+                        getOperatorString(node->type));
+                }
+            }
             break;
             
         default:
-            semanticError(node->lineno, "Unknown expression type");
+            semanticError(node->lineno, "Unknown expression type %d", node->type);
             break;
     }
 }
