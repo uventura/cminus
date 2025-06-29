@@ -24,6 +24,6 @@ sudo apt-get install bison flex
 ### Test
 - semantic
 ```
-./bin/cminus tests/semantic_test.cm  # expected to pass
-./bin/cminus tests/semantic_error.cm  # expects semantic analyzer to detect errors
+make clean && make semantic  && ./bin/semantic < examples/semantic_correct.cm   # expected to pass
+make clean && make semantic  && ./bin/semantic < examples/semantic_error.cm   # expects semantic analyzer to detect errors
 ```
