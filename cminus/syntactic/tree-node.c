@@ -49,6 +49,14 @@ TreeNode *newBinaryNode(NodeType type, TreeNode *left, TreeNode *right, int line
     return node;
 }
 
+const char* typeToString(DataType type) {
+    switch(type) {
+        case TYPE_INT:  return "int";
+        case TYPE_VOID: return "void";
+        case TYPE_ERROR: return "error";
+        default: return "unknown";
+    }
+}
 
 // TreeNode * newTreeNode(NodeType type, int lineno);
 // extern TreeNode *rootNode;  // Global syntax tree root

@@ -21,6 +21,9 @@ typedef enum {
     TYPE_ERROR  // 2 (for invalid types)
 } DataType;
 
+const char* typeToString(DataType type);
+
+
 typedef struct attribute {
     union
     {

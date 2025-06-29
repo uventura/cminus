@@ -27,6 +27,8 @@ void checkTypeCompatibility(DataType expected, DataType actual, int lineno, cons
 void checkVariableDeclaration(TreeNode *node, SymbolTable *table);
 void checkFunctionDeclaration(TreeNode *node, SymbolTable *table);
 void checkFunctionCall(TreeNode *node, SymbolTable *table);
+void markSymbolAsUsed(SymbolTable *table, const char *name);
+
 
 // Error reporting
 void semanticError(int lineno, const char *format, ...);

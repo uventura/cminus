@@ -4,18 +4,11 @@
 #include <stdarg.h>
 #include "semantic.h"
 #include "../lexer/tokens.h"
+// #include "../helpers.h"
 
 // Global flag to track if any semantic errors were found
 static int hasSemanticErrors = 0;
 
-const char* typeToString(DataType type) {
-    switch(type) {
-        case TYPE_INT:  return "int";
-        case TYPE_VOID: return "void";
-        case TYPE_ERROR: return "error";
-        default: return "unknown";
-    }
-}
 
 static const char* getOperatorString(NodeType type) {
     switch(type) {
