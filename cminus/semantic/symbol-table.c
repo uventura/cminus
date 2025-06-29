@@ -18,8 +18,23 @@ void enterScope(SymbolTable *table) {
     }
 }
 
+void checkUnusedVariables(SymbolTable *table, int currentScope) {
+    Symbol *current = table->head;
+    while (current) {
+        if (current->scope == currentScope && 
+            current->type == VAR && 
+            !current->wasUsed) {
+            fprintf(stderr, "Warning (line %d): Variable '%s' of type %s declared but never used\n", 
+                   current->scope, current->name, typeToString(current->dataType));
+        }
+        current = current->next;
+    }
+}
+
 void exitScope(SymbolTable *table) {
     if (!table) return;
+    // warns of unused variables in  scope
+    checkUnusedVariables(table, table->currentScope);
     
     Symbol **ptr = &table->head;
     while (*ptr) {
@@ -35,7 +50,6 @@ void exitScope(SymbolTable *table) {
     
     table->currentScope--;
 }
-
 Symbol* lookup(SymbolTable *table, const char *name) {
     // printf("\tDEBUG LOOKING UP: %s at scope %d\n", name, table->currentScope);   //# DEBUG
 
@@ -49,6 +63,19 @@ Symbol* lookup(SymbolTable *table, const char *name) {
         current = current->next;
     }
     return NULL;
+}
+
+void markSymbolAsUsed(SymbolTable *table, const char *name) {
+    if (!table || !name) return;
+    
+    Symbol *current = table->head;
+    while (current) {
+        if (strcmp(current->name, name) == 0) {
+            current->wasUsed = 1;
+            return;
+        }
+        current = current->next;
+    }
 }
 
 Symbol* insert(SymbolTable *table, const char *name, SymbolType type, int dataType) {
@@ -87,6 +114,7 @@ Symbol* insert(SymbolTable *table, const char *name, SymbolType type, int dataTy
     symbol->scope = table->currentScope;
     symbol->next = table->head;
     table->head = symbol;
+    symbol->wasUsed = 0;  // unused
     
     return symbol;
 }

@@ -8,11 +8,13 @@ typedef enum {
     FUNC
 } SymbolType;
 
+
 typedef struct Symbol {
     char *name;
     SymbolType type;
-    int dataType; // INT or VOID from tokens.h
+    int dataType;
     int scope;
+    int wasUsed; 
     struct Symbol *next;
 } Symbol;
 

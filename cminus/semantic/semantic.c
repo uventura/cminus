@@ -5,10 +5,8 @@
 #include "semantic.h"
 #include "../lexer/tokens.h"
 
-
 // Global flag to track if any semantic errors were found
 static int hasSemanticErrors = 0;
-
 
 const char* typeToString(DataType type) {
     switch(type) {
@@ -109,6 +107,7 @@ void checkProgram(TreeNode *node, SymbolTable *table) {
             if (!lookup(table, node->attribute.name)) {
                 semanticError(node->lineno, "Undeclared identifier '%s'", node->attribute.name);
             }
+            markSymbolAsUsed(table, node->attribute.name); 
             return;
         case NStatement:
             checkStatement(node, table);
@@ -491,3 +490,4 @@ void checkTypeCompatibility(DataType expected, DataType actual, int lineno, cons
             typeToString(actual));
     }
 }
+
