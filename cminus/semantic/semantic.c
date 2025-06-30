@@ -103,7 +103,7 @@ void checkProgram(TreeNode *node, SymbolTable *table) {
         case NStatement:
             checkStatement(node, table);
             return;
-        case NIfElseStmt:  // Add this case
+        case NIfElseStmt: 
             checkIfStatement(node, table);
             return;
         default:
@@ -160,6 +160,7 @@ void checkProgram(TreeNode *node, SymbolTable *table) {
                 break;
             case NNumber:
                 break;
+            case NIfStmt:
             case NIfElseStmt:
                 checkIfStatement(child, table);
                 break;
@@ -178,7 +179,7 @@ void checkProgram(TreeNode *node, SymbolTable *table) {
                 checkAssignment(child, table);
                 break;
             default:
-                semanticError(child->lineno, "Unexpected node type %d in program", child->type);
+                semanticError(child->lineno, "Unexpected node type %s (%d) in program", getNodeTypeName(child->type), child->type);
                 break;
         }
         child = child->sibling;
@@ -222,7 +223,8 @@ void checkAssignment(TreeNode *node, SymbolTable *table) {
 
     Symbol *sym = lookup(table, lhs->attribute.name);
     if (!sym) {
-        semanticError(lhs->lineno, "Undeclared variable '%s'", lhs->attribute.name);
+        semanticError(lhs->lineno, "Undeclared variable '%s'. Variables in scope", lhs->attribute.name);
+        printSymbolTable(table);
         return;
     }
 
@@ -253,17 +255,18 @@ void checkIfStatement(TreeNode *node, SymbolTable *table) {
         return;
     }
 
+    // Check condition
     TreeNode *cond = node->children[0];
     if (cond) {
         checkExpression(cond, table);
         DataType condType = getExpressionType(cond, table);
         
-        if (condType != TYPE_INT) {
-            semanticError(cond->lineno, "If condition can only be type %d (INT), is %d", TYPE_INT, &condType);
-        } 
+        if (condType == TYPE_VOID) {
+            semanticError(cond->lineno, "If condition cannot be void");
+        }
     }
 
-    // Check then branch
+    // Check then branch with new scope
     TreeNode *thenBranch = node->children[1];
     if (thenBranch) {
         enterScope(table);
@@ -271,7 +274,7 @@ void checkIfStatement(TreeNode *node, SymbolTable *table) {
         exitScope(table);
     }
 
-    // Check else branch if it exists
+    // Check else branch if it exists (for NIfElseStmt)
     if (node->type == NIfElseStmt) {
         TreeNode *elseBranch = node->children[2];
         if (elseBranch) {
@@ -356,6 +359,7 @@ void checkStatement(TreeNode *node, SymbolTable *table) {
             checkExpression(node->children[1], table);
             break;
             
+        case NIfStmt:
         case NIfElseStmt:
             checkExpression(node->children[0], table);
             checkStatement(node->children[1], table);

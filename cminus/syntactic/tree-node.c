@@ -62,3 +62,38 @@ const char* typeToString(DataType type) {
 // extern TreeNode *rootNode;  // Global syntax tree root
 
 TreeNode *rootNode = NULL;  // Definition of global root node
+
+// helpers
+const char* getNodeTypeName(NodeType type) {
+    switch (type) {
+        case NProgram: return "NProgram";
+        case NCmdList: return "NCmdList";
+        case NCmd: return "NCmd";
+        case NAssignStmt: return "NAssignStmt";
+        case NIdentifier: return "NIdentifier";
+        case NExpr: return "NExpr";
+        case NOperator: return "NOperator";
+        case NNumber: return "NNumber";
+        case NIfElseStmt: return "NIfElseStmt";
+        case NReturnStmt: return "NReturnStmt";
+        case NCompoundStmt: return "NCompoundStmt";
+        case NType: return "NType";
+        case NStatement: return "NStatement";
+        case NDeclaration: return "NDeclaration";
+        case NCall: return "NCall";
+        case NBlock: return "NBlock";
+        case NAssign: return "NAssign";
+        case NIfStmt: return "NIfStmt";
+        case NMultiply: return "NMultiply";
+        case NDivide: return "NDivide";
+        case NPlus: return "NPlus";
+        case NMinus: return "NMinus";
+        case NLess: return "NLess";
+        case NLessEqual: return "NLessEqual";
+        case NGreater: return "NGreater";
+        case NGreaterEqual: return "NGreaterEqual";
+        case NEqual: return "NEqual";
+        case NNotEqual: return "NNotEqual";
+        default: return "Unknown NodeType";
+    }
+}

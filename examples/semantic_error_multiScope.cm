@@ -6,12 +6,18 @@
     y = 10;
     
     if (y < x) {
+        
+        int printSymbolTable;
         x = x + 1; 
-        outOfScope = x;
+    
     } else {
-        int outOfScope;
-        y = y - 1;
+    
+        int inScope;
+        if(1){
+            inScope = 1;
+            printSymbolTable= 0;
+        }
+
     }
 
-    y = y + outOfScope;
 }
