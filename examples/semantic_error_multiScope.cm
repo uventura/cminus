@@ -1,0 +1,17 @@
+{
+    int x;
+    int y;
+    
+    x = 5;
+    y = 10;
+    
+    if (y < x) {
+        x = x + 1; 
+        outOfScope = x;
+    } else {
+        int outOfScope;
+        y = y - 1;
+    }
+
+    y = y + outOfScope;
+}

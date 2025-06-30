@@ -74,8 +74,8 @@ program: block {
 block: OPEN_BRACES stmt_list CLOSE_BRACES {
     $$ = newTreeNode(NBlock, yylineno);
     $$->children[0] = $2;  // stmt_list
+    printf("DEBUG: Created block node\n");
 }
-;
 
 declaration: type_specifier identifier SEMICOLON {
     $$ = newTreeNode(NDeclaration, yylineno);
@@ -148,7 +148,7 @@ compound_stmt:
         $$ = $1; // block already returns a TreeNode*
     }
 ;
-
+// !todo ensure strdup($1) is freed in freeTree()
 identifier:
     ID {
         printf("PARSER: Creating ID node from '%s' (pointer: %p)\n", $1, $1);  // Debug
