@@ -4,7 +4,7 @@
 #include <stdarg.h>
 #include "semantic.h"
 #include "../lexer/tokens.h"
-// #include "../helpers.h"
+#include "../utils/debug.h"
 
 // Global flag to track if any semantic errors were found
 static int hasSemanticErrors = 0;
@@ -28,7 +28,7 @@ static const char* getOperatorString(NodeType type) {
 
 
 void printSymbolTable(SymbolTable *table) {
-    printf("\tDEBUG: Symbol Table (scope %d):\n", table->currentScope);
+    debug_print("\tdebug Semantic: Symbol Table (scope %d):\n", table->currentScope);
     Symbol *current = table->head;
     while (current) {
         printf("\t  %s: %s (scope %d, type: %s)\n", 
@@ -194,7 +194,7 @@ void checkBlock(TreeNode *node, SymbolTable *table) {
         return;
     }
 
-    printf("DEBUG: Entering block at line %d\n", node->lineno);
+    debug_print("\tdebug Semantic: Entering block at line %d\n", node->lineno);
     enterScope(table);
     
     TreeNode *stmt = node->children[0];
@@ -204,7 +204,7 @@ void checkBlock(TreeNode *node, SymbolTable *table) {
     }
     
     exitScope(table);
-    printf("DEBUG: Exiting block at line %d\n", node->lineno);
+    debug_print("\tdebug Semantic: Exiting block at line %d\n", node->lineno);
 }
 
 void checkAssignment(TreeNode *node, SymbolTable *table) {
@@ -234,7 +234,7 @@ void checkAssignment(TreeNode *node, SymbolTable *table) {
         DataType lhsType = sym->dataType;
         DataType rhsType = getExpressionType(rhs, table);
         
-        printf("DEBUG: Assignment type check - lhs: %s (%s), rhs: %s\n",
+        debug_print("\tdebug Semantic: Assignment type check - lhs: %s (%s), rhs: %s\n",
                lhs->attribute.name, 
                typeToString(lhsType),
                typeToString(rhsType));
@@ -298,7 +298,7 @@ void checkReturnStatement(TreeNode *node, SymbolTable *table) {
 }
 
 void checkDeclaration(TreeNode *node, SymbolTable *table) {
-    printf("\tDEBUG: Checking declaration, name: %s\n", 
+    debug_print("\tdebug Semantic: Checking declaration, name: %s\n", 
            node->children[1]->attribute.name);
 
     if (!node || node->type != NDeclaration) {
@@ -315,7 +315,7 @@ void checkDeclaration(TreeNode *node, SymbolTable *table) {
         return;
     }
 
-    printf("\tDEBUG: Declaring %s with type %d\n", 
+    debug_print("\tdebug Semantic: Declaring %s with type %d\n", 
            idNode->attribute.name, typeNode->dataType);
 
     int dataType = typeNode->dataType;
@@ -323,7 +323,7 @@ void checkDeclaration(TreeNode *node, SymbolTable *table) {
 
     // Propagate type to identifier node
     idNode->dataType = dataType;
-    printf("DEBUG: Setting type %d for identifier %s\n", dataType, name);
+    debug_print("\tdebug Semantic: Setting type %d for identifier %s\n", dataType, name);
 
     Symbol *existing = lookup(table, name);
     if (existing && existing->scope == table->currentScope) {
@@ -337,7 +337,7 @@ void checkDeclaration(TreeNode *node, SymbolTable *table) {
         return;
     }
     
-    printf("DEBUG: Added to symbol table - %s: %d\n", name, dataType);
+    debug_print("\tdebug Semantic: Added to symbol table - %s: %d\n", name, dataType);
 }
 
 void checkStatement(TreeNode *node, SymbolTable *table) {
@@ -453,7 +453,7 @@ void checkFunctionCall(TreeNode *node, SymbolTable *table) {
 
 DataType getExpressionType(TreeNode *expr, SymbolTable *table) {
     if (!expr) {
-        printf("DEBUG: getExpressionType called with NULL expression\n");
+        debug_print("\tdebug Semantic: getExpressionType called with NULL expression\n");
         return TYPE_ERROR;
     }
     

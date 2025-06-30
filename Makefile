@@ -112,7 +112,7 @@ semantic: $(OBJS) $(LEXER_OBJ) $(SYNTACTIC_OBJ) $(SYNTACTIC_HDR)
 	@flex -o $(LEXER_OUT) $(LEXER_IN)
 	@bison -Wcounterexamples -d --defines=$(SYNTACTIC_HDR) -o $(SYNTACTIC_OUT) $(SYNTACTIC_IN)
 	@mkdir -p $(BIN_DIR)
-	@$(CC) -o $(BIN_DIR)/$(SEMANTIC_BIN) $^ $(CFLAGS) -O3 -Icminus -DDEBUG -D$(SEMANTIC_MODE_FLAG)
+	@$(CC) -o $(BIN_DIR)/$(SEMANTIC_BIN) $^ $(CFLAGS) -O3 -Icminus -DDEBUG -D$(LEXER_MODE_FLAG)
 	@echo "> Successfully generated!"
 
 #==========================

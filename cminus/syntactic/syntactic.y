@@ -2,6 +2,7 @@
 %{
 #include "tree-node.h"
 #include "../semantic/semantic.h" 
+#include "../utils/debug.h" 
 #include <stdio.h> 
 #include <stdlib.h>
 #include <string.h> 
@@ -56,7 +57,7 @@ line: program { printf("Program syntax is correct!\n"); }
 ;
 
 program: block { 
-    printf("Program node creation\n");
+    debug_print("debug Parser: Program node creation\n");
     $$ = newTreeNode(NProgram, @$.first_line);
     if ($1 == NULL) {
         printf("!! Block is NULL!\n");
@@ -74,7 +75,7 @@ program: block {
 block: OPEN_BRACES stmt_list CLOSE_BRACES {
     $$ = newTreeNode(NBlock, yylineno);
     $$->children[0] = $2;  // stmt_list
-    printf("DEBUG: Created block node\n");
+    debug_print("\tdebug Syntactic: Created block node\n");
 }
 
 declaration: type_specifier identifier SEMICOLON {
@@ -83,7 +84,7 @@ declaration: type_specifier identifier SEMICOLON {
     $$->children[1] = $2;  // identifier (e.g., "a")
     // Ensure type is properly set in the identifier
     $2->dataType = $1->dataType;
-    printf("DECLARATION: Set type %d for identifier %s\n", 
+    debug_print("debug Parser: DECLARATION Set type %d for identifier %s\n", 
            $1->dataType, $2->attribute.name);
 }
 
@@ -151,7 +152,7 @@ compound_stmt:
 // !todo ensure strdup($1) is freed in freeTree()
 identifier:
     ID {
-        printf("PARSER: Creating ID node from '%s' (pointer: %p)\n", $1, $1);  // Debug
+        debug_print("\tdebug Parser: Creating ID node from '%s' (pointer: %p)\n", $1, $1);  // Debug
         $$ = newTreeNode(NIdentifier, yylineno);
         if ($1 == NULL) {
             yyerror("Identifier name is NULL");
@@ -164,7 +165,7 @@ identifier:
         }
         // Initialize dataType to some default (will be overwritten by declaration)
         $$->dataType = -1; 
-        printf("PARSER: Set node name to %p\n", $$->attribute.name);  // Debug
+        debug_print("\tdebug Parser: Set node name to %p\n", $$->attribute.name);  // Debug
     }
 ;
 

@@ -63,7 +63,7 @@ END_COMMENT    "*/"
     debug_print("[ %s \033[0;33m<Identifier>\033[0m ]", yytext);
 #endif
 
-    printf("LEXER: Found ID '%s'\n", yytext);  // Debug
+    debug_print("\tdebug Lexer: Found ID '%s'\n", yytext);  // Debug
     yylval.cadeia = strdup(yytext);  // Set the semantic value
     return ID;
 }
