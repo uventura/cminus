@@ -43,6 +43,7 @@ END_COMMENT    "*/"
 #ifdef LEXER_MODE
     debug_print("[ %s \033[0;33m<Number>\033[0m ]", yytext);
 #else
+    yylval.num_value = atoi(yytext);
     return NUMBER;
 #endif
 }

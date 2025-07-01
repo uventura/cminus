@@ -90,7 +90,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 18 "cminus/syntactic/syntactic.y"
+#line 20 "cminus/syntactic/syntactic.y"
 
     struct treeNode* node;
     int num_value;

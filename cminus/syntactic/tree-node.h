@@ -15,6 +15,8 @@ typedef enum {
     NNotEqual
 } NodeType;
 
+const char* nodeTypeToString(NodeType type);
+
 typedef enum {
     TYPE_INT,   
     TYPE_VOID,
@@ -57,6 +59,7 @@ typedef struct treeNode {
 TreeNode * newTreeNode(NodeType type, int lineno);
 TreeNode *newBinaryNode(NodeType type, TreeNode *left, TreeNode *right, int lineno);
 void freeTree(TreeNode *node);
+void printTree(const TreeNode *t);
 extern TreeNode *rootNode;  // Global syntax tree root
 
 #endif

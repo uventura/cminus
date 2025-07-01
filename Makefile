@@ -35,6 +35,9 @@ SYNTACTIC_MODE_FLAG = SYNTACTIC_MODE
 SEMANTIC_BIN = semantic
 SEMANTIC_MODE_FLAG = SEMANTIC_MODE
 
+CODEGEN_BIN = codegen
+CODEGEN_MODE_FLAG = CODEGEN_MODE
+
 SRC_DIR = cminus
 
 SRCS = $(shell find $(SRC_DIR) -name '*.c')
@@ -113,6 +116,17 @@ semantic: $(OBJS) $(LEXER_OBJ) $(SYNTACTIC_OBJ) $(SYNTACTIC_HDR)
 	@bison -Wcounterexamples -d --defines=$(SYNTACTIC_HDR) -o $(SYNTACTIC_OUT) $(SYNTACTIC_IN)
 	@mkdir -p $(BIN_DIR)
 	@$(CC) -o $(BIN_DIR)/$(SEMANTIC_BIN) $^ $(CFLAGS) -O3 -Icminus -DDEBUG -D$(SEMANTIC_MODE_FLAG)
+	@echo "> Successfully generated!"
+
+#====================
+#|     CODEGEN      |
+#====================
+codegen: $(OBJS) $(LEXER_OBJ) $(SYNTACTIC_OBJ) $(SYNTACTIC_HDR)
+	@echo "Building Codgen..."
+	@flex -o $(LEXER_OUT) $(LEXER_IN)
+	@bison -Wcounterexamples -d --defines=$(SYNTACTIC_HDR) -o $(SYNTACTIC_OUT) $(SYNTACTIC_IN)
+	@mkdir -p $(BIN_DIR)
+	@$(CC) -o $(BIN_DIR)/$(CODEGEN_BIN) $^ $(CFLAGS) -O3 -Icminus -DDEBUG -D$(CODEGEN_MODE_FLAG)
 	@echo "> Successfully generated!"
 
 #==========================

@@ -53,7 +53,7 @@ void semanticError(int lineno, const char *format, ...) {
     hasSemanticErrors = 1;
 }
 
-void semanticAnalysis(TreeNode *syntaxTree) {
+SymbolTable* semanticAnalysis(TreeNode *syntaxTree) {
     if (!syntaxTree) {
         fprintf(stderr, "Error: Empty syntax tree\n");
         exit(1);
@@ -67,8 +67,9 @@ void semanticAnalysis(TreeNode *syntaxTree) {
         exit(1);
     }
     
-    freeSymbolTable(table);
     printf("Program is semantically correct!\n");
+
+    return table;
 }
 
 void checkProgram(TreeNode *node, SymbolTable *table) {
@@ -104,6 +105,14 @@ void checkProgram(TreeNode *node, SymbolTable *table) {
             return;
         case NStatement:
             checkStatement(node, table);
+            return;
+        case NIfStmt:
+            printf("\tDEBUG: case NIfStmt\n");
+            checkIfStatement(node, table);
+            return;
+        case NIfElseStmt:
+            printf("\tDEBUG: case NIfElseStmt\n");
+            checkIfStatement(node, table);
             return;
         default:
             printf("\tunexpected node type, likely an ERROR\n");
@@ -169,6 +178,10 @@ void checkProgram(TreeNode *node, SymbolTable *table) {
                 break;
             case NNumber:
                 printf("\tDEBUG: case NNumber\n");
+                break;
+            case NIfStmt:
+                printf("\tDEBUG: case NIfStmt\n");
+                checkIfStatement(child, table);
                 break;
             case NIfElseStmt:
                 printf("\tDEBUG: case NIfElseStmt\n");
@@ -257,7 +270,7 @@ void checkAssignment(TreeNode *node, SymbolTable *table) {
 }
 
 void checkIfStatement(TreeNode *node, SymbolTable *table) {
-    if (!node || node->type != NIfElseStmt) {
+    if (!node || (node->type != NIfElseStmt && node->type != NIfStmt)) {
         semanticError(node ? node->lineno : 0, "Expected if statement node");
         return;
     }

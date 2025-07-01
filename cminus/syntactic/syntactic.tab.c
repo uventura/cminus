@@ -71,6 +71,7 @@
 
 #include "tree-node.h"
 #include "../semantic/semantic.h" 
+#include "../codegen/codegen.h" 
 #include <stdio.h> 
 #include <stdlib.h>
 #include <string.h> 
@@ -79,10 +80,11 @@ extern int lineno;
 extern int yylineno;
 extern TreeNode *rootNode;
 extern char* yytext;
+extern FILE *yyin;
 int yylex();
 void yyerror(char *s);
 
-#line 86 "cminus/syntactic/syntactic.tab.c"
+#line 88 "cminus/syntactic/syntactic.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -545,10 +547,10 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    49,    49,    51,    52,    55,    58,    74,    80,    91,
-      95,   102,   112,   118,   121,   124,   128,   136,   141,   147,
-     153,   172,   173,   174,   175,   176,   177,   178,   179,   180,
-     181,   182,   183
+       0,    51,    51,    53,    54,    57,    60,    76,    82,    93,
+      97,   104,   114,   120,   123,   126,   130,   138,   143,   149,
+     155,   174,   175,   176,   177,   178,   179,   180,   181,   182,
+     183,   184,   185
 };
 #endif
 
@@ -1263,19 +1265,19 @@ yyreduce:
   switch (yyn)
     {
   case 4: /* input: error  */
-#line 52 "cminus/syntactic/syntactic.y"
+#line 54 "cminus/syntactic/syntactic.y"
           { yyerror("Invalid input"); yyclearin; }
-#line 1269 "cminus/syntactic/syntactic.tab.c"
+#line 1271 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 5: /* line: program  */
-#line 55 "cminus/syntactic/syntactic.y"
+#line 57 "cminus/syntactic/syntactic.y"
               { printf("Program syntax is correct!\n"); }
-#line 1275 "cminus/syntactic/syntactic.tab.c"
+#line 1277 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 6: /* program: block  */
-#line 58 "cminus/syntactic/syntactic.y"
+#line 60 "cminus/syntactic/syntactic.y"
                { 
     printf("Program node creation\n");
     (yyval.node) = newTreeNode(NProgram, (yyloc).first_line);
@@ -1290,20 +1292,20 @@ yyreduce:
     rootNode = (yyval.node);
     printf("Root node set to %p\n", (void*)rootNode);
 }
-#line 1294 "cminus/syntactic/syntactic.tab.c"
+#line 1296 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 7: /* block: OPEN_BRACES stmt_list CLOSE_BRACES  */
-#line 74 "cminus/syntactic/syntactic.y"
+#line 76 "cminus/syntactic/syntactic.y"
                                           {
     (yyval.node) = newTreeNode(NBlock, yylineno);
     (yyval.node)->children[0] = (yyvsp[-1].node);  // stmt_list
 }
-#line 1303 "cminus/syntactic/syntactic.tab.c"
+#line 1305 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 8: /* declaration: type_specifier identifier SEMICOLON  */
-#line 80 "cminus/syntactic/syntactic.y"
+#line 82 "cminus/syntactic/syntactic.y"
                                                  {
     (yyval.node) = newTreeNode(NDeclaration, yylineno);
     (yyval.node)->children[0] = (yyvsp[-2].node);  // type (INT/VOID)
@@ -1313,29 +1315,29 @@ yyreduce:
     printf("DECLARATION: Set type %d for identifier %s\n", 
            (yyvsp[-2].node)->dataType, (yyvsp[-1].node)->attribute.name);
 }
-#line 1317 "cminus/syntactic/syntactic.tab.c"
+#line 1319 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 9: /* type_specifier: INT  */
-#line 91 "cminus/syntactic/syntactic.y"
+#line 93 "cminus/syntactic/syntactic.y"
         {
         (yyval.node) = newTreeNode(NType, yylineno);
         (yyval.node)->dataType = TYPE_INT;  // Use consistent type value
     }
-#line 1326 "cminus/syntactic/syntactic.tab.c"
+#line 1328 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 10: /* type_specifier: VOID  */
-#line 95 "cminus/syntactic/syntactic.y"
+#line 97 "cminus/syntactic/syntactic.y"
          {
         (yyval.node) = newTreeNode(NType, yylineno);
         (yyval.node)->dataType = TYPE_VOID;
     }
-#line 1335 "cminus/syntactic/syntactic.tab.c"
+#line 1337 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 11: /* stmt_list: stmt stmt_list  */
-#line 102 "cminus/syntactic/syntactic.y"
+#line 104 "cminus/syntactic/syntactic.y"
                    {
         if ((yyvsp[-1].node) == NULL) {
             (yyval.node) = (yyvsp[0].node);
@@ -1346,74 +1348,74 @@ yyreduce:
             (yyval.node) = (yyvsp[-1].node);
         }
     }
-#line 1350 "cminus/syntactic/syntactic.tab.c"
+#line 1352 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 12: /* stmt_list: %empty  */
-#line 112 "cminus/syntactic/syntactic.y"
+#line 114 "cminus/syntactic/syntactic.y"
                 {
         (yyval.node) = NULL;
     }
-#line 1358 "cminus/syntactic/syntactic.tab.c"
+#line 1360 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 13: /* stmt: simple_stmt SEMICOLON  */
-#line 118 "cminus/syntactic/syntactic.y"
+#line 120 "cminus/syntactic/syntactic.y"
                           {
         (yyval.node) = (yyvsp[-1].node);
     }
-#line 1366 "cminus/syntactic/syntactic.tab.c"
+#line 1368 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 14: /* stmt: compound_stmt  */
-#line 121 "cminus/syntactic/syntactic.y"
+#line 123 "cminus/syntactic/syntactic.y"
                   {
         (yyval.node) = (yyvsp[0].node);
     }
-#line 1374 "cminus/syntactic/syntactic.tab.c"
+#line 1376 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 16: /* simple_stmt: identifier ASSIGN expr  */
-#line 128 "cminus/syntactic/syntactic.y"
+#line 130 "cminus/syntactic/syntactic.y"
                            {
         (yyval.node) = newTreeNode(NAssign, yylineno);
         (yyval.node)->children[0] = (yyvsp[-2].node);
         (yyval.node)->children[1] = (yyvsp[0].node);
     }
-#line 1384 "cminus/syntactic/syntactic.tab.c"
+#line 1386 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 17: /* compound_stmt: IF OPEN_PARENTHESIS expr CLOSE_PARENTHESIS stmt  */
-#line 136 "cminus/syntactic/syntactic.y"
+#line 138 "cminus/syntactic/syntactic.y"
                                                                           {
         (yyval.node) = newTreeNode(NIfStmt, yylineno);
         (yyval.node)->children[0] = (yyvsp[-2].node); // condition (expr)
         (yyval.node)->children[1] = (yyvsp[0].node); // then-part (stmt)
     }
-#line 1394 "cminus/syntactic/syntactic.tab.c"
+#line 1396 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 18: /* compound_stmt: IF OPEN_PARENTHESIS expr CLOSE_PARENTHESIS stmt ELSE stmt  */
-#line 141 "cminus/syntactic/syntactic.y"
+#line 143 "cminus/syntactic/syntactic.y"
                                                                 {
         (yyval.node) = newTreeNode(NIfElseStmt, yylineno);
         (yyval.node)->children[0] = (yyvsp[-4].node); // condition (expr)
         (yyval.node)->children[1] = (yyvsp[-2].node); // then-part (stmt)
         (yyval.node)->children[2] = (yyvsp[0].node); // else-part (stmt)
     }
-#line 1405 "cminus/syntactic/syntactic.tab.c"
+#line 1407 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 19: /* compound_stmt: block  */
-#line 147 "cminus/syntactic/syntactic.y"
+#line 149 "cminus/syntactic/syntactic.y"
             {
         (yyval.node) = (yyvsp[0].node); // block already returns a TreeNode*
     }
-#line 1413 "cminus/syntactic/syntactic.tab.c"
+#line 1415 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 20: /* identifier: ID  */
-#line 153 "cminus/syntactic/syntactic.y"
+#line 155 "cminus/syntactic/syntactic.y"
        {
         printf("PARSER: Creating ID node from '%s' (pointer: %p)\n", (yyvsp[0].cadeia), (yyvsp[0].cadeia));  // Debug
         (yyval.node) = newTreeNode(NIdentifier, yylineno);
@@ -1430,86 +1432,86 @@ yyreduce:
         (yyval.node)->dataType = -1; 
         printf("PARSER: Set node name to %p\n", (yyval.node)->attribute.name);  // Debug
     }
-#line 1434 "cminus/syntactic/syntactic.tab.c"
+#line 1436 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 21: /* expr: expr MULTIPLY expr  */
-#line 172 "cminus/syntactic/syntactic.y"
+#line 174 "cminus/syntactic/syntactic.y"
                        { (yyval.node) = newBinaryNode(NMultiply, (yyvsp[-2].node), (yyvsp[0].node), yylineno); }
-#line 1440 "cminus/syntactic/syntactic.tab.c"
+#line 1442 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 22: /* expr: expr DIVIDE expr  */
-#line 173 "cminus/syntactic/syntactic.y"
+#line 175 "cminus/syntactic/syntactic.y"
                        { (yyval.node) = newBinaryNode(NDivide, (yyvsp[-2].node), (yyvsp[0].node), yylineno); }
-#line 1446 "cminus/syntactic/syntactic.tab.c"
+#line 1448 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 23: /* expr: expr PLUS expr  */
-#line 174 "cminus/syntactic/syntactic.y"
+#line 176 "cminus/syntactic/syntactic.y"
                      { (yyval.node) = newBinaryNode(NPlus, (yyvsp[-2].node), (yyvsp[0].node), yylineno); }
-#line 1452 "cminus/syntactic/syntactic.tab.c"
+#line 1454 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 24: /* expr: expr MINUS expr  */
-#line 175 "cminus/syntactic/syntactic.y"
+#line 177 "cminus/syntactic/syntactic.y"
                       { (yyval.node) = newBinaryNode(NMinus, (yyvsp[-2].node), (yyvsp[0].node), yylineno); }
-#line 1458 "cminus/syntactic/syntactic.tab.c"
+#line 1460 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 25: /* expr: expr LESS expr  */
-#line 176 "cminus/syntactic/syntactic.y"
+#line 178 "cminus/syntactic/syntactic.y"
                      { (yyval.node) = newBinaryNode(NLess, (yyvsp[-2].node), (yyvsp[0].node), yylineno); }
-#line 1464 "cminus/syntactic/syntactic.tab.c"
+#line 1466 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 26: /* expr: expr LESS_EQUAL expr  */
-#line 177 "cminus/syntactic/syntactic.y"
+#line 179 "cminus/syntactic/syntactic.y"
                            { (yyval.node) = newBinaryNode(NLessEqual, (yyvsp[-2].node), (yyvsp[0].node), yylineno); }
-#line 1470 "cminus/syntactic/syntactic.tab.c"
+#line 1472 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 27: /* expr: expr GREATER expr  */
-#line 178 "cminus/syntactic/syntactic.y"
+#line 180 "cminus/syntactic/syntactic.y"
                         { (yyval.node) = newBinaryNode(NGreater, (yyvsp[-2].node), (yyvsp[0].node), yylineno); }
-#line 1476 "cminus/syntactic/syntactic.tab.c"
+#line 1478 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 28: /* expr: expr GREATER_EQUAL expr  */
-#line 179 "cminus/syntactic/syntactic.y"
+#line 181 "cminus/syntactic/syntactic.y"
                               { (yyval.node) = newBinaryNode(NGreaterEqual, (yyvsp[-2].node), (yyvsp[0].node), yylineno); }
-#line 1482 "cminus/syntactic/syntactic.tab.c"
+#line 1484 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 29: /* expr: expr EQUAL expr  */
-#line 180 "cminus/syntactic/syntactic.y"
+#line 182 "cminus/syntactic/syntactic.y"
                       { (yyval.node) = newBinaryNode(NEqual, (yyvsp[-2].node), (yyvsp[0].node), yylineno); }
-#line 1488 "cminus/syntactic/syntactic.tab.c"
+#line 1490 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 30: /* expr: expr NOT_EQUAL expr  */
-#line 181 "cminus/syntactic/syntactic.y"
+#line 183 "cminus/syntactic/syntactic.y"
                           { (yyval.node) = newBinaryNode(NNotEqual, (yyvsp[-2].node), (yyvsp[0].node), yylineno); }
-#line 1494 "cminus/syntactic/syntactic.tab.c"
+#line 1496 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 31: /* expr: identifier  */
-#line 182 "cminus/syntactic/syntactic.y"
+#line 184 "cminus/syntactic/syntactic.y"
                  { (yyval.node) = (yyvsp[0].node); }
-#line 1500 "cminus/syntactic/syntactic.tab.c"
+#line 1502 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 32: /* expr: NUMBER  */
-#line 183 "cminus/syntactic/syntactic.y"
+#line 185 "cminus/syntactic/syntactic.y"
              { 
         (yyval.node) = newTreeNode(NNumber, yylineno); 
         (yyval.node)->attribute.value = (yyvsp[0].num_value);
     }
-#line 1509 "cminus/syntactic/syntactic.tab.c"
+#line 1511 "cminus/syntactic/syntactic.tab.c"
     break;
 
 
-#line 1513 "cminus/syntactic/syntactic.tab.c"
+#line 1515 "cminus/syntactic/syntactic.tab.c"
 
       default: break;
     }
@@ -1707,18 +1709,37 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 189 "cminus/syntactic/syntactic.y"
+#line 191 "cminus/syntactic/syntactic.y"
 
 
-int main() 
+int main(int argc, char *argv[]) 
 {
+    const char *filename = "cminus.tm";
+    if ( argc > 1 ) {
+        yyin = fopen( argv[1], "r" );
+        if (!yyin) {
+            perror(argv[1]);
+            return 1;
+        }
+        if (argc > 2)
+            filename = argv[2];
+    }
+    else yyin = stdin;
+
     rootNode = NULL; 
     
     yyparse();
     
     if (rootNode) {
+        printTree(rootNode);
+
         printf("Semantic analysis:\n");
-        semanticAnalysis(rootNode);
+        SymbolTable *symbolTable = semanticAnalysis(rootNode);
+        
+        printf("Generating code:\n");
+        generateCode(filename, rootNode, symbolTable);
+        
+        freeSymbolTable(symbolTable);
         freeTree(rootNode);
     } else {
         fprintf(stderr, "Error: No syntax tree generated\n");

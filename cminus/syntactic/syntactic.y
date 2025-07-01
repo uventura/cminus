@@ -2,6 +2,7 @@
 %{
 #include "tree-node.h"
 #include "../semantic/semantic.h" 
+#include "../codegen/codegen.h" 
 #include <stdio.h> 
 #include <stdlib.h>
 #include <string.h> 
@@ -10,6 +11,7 @@ extern int lineno;
 extern int yylineno;
 extern TreeNode *rootNode;
 extern char* yytext;
+extern FILE *yyin;
 int yylex();
 void yyerror(char *s);
 %}
@@ -188,15 +190,33 @@ expr:
 
 %%
 
-int main() 
+int main(int argc, char *argv[]) 
 {
+    const char *filename = "cminus.tm";
+    if ( argc > 1 ) {
+        yyin = fopen( argv[1], "r" );
+        if (!yyin) {
+            perror(argv[1]);
+            return 1;
+        }
+        if (argc > 2)
+            filename = argv[2];
+    }
+    else yyin = stdin;
+
     rootNode = NULL; 
     
     yyparse();
     
     if (rootNode) {
+        printTree(rootNode);
+
         printf("Semantic analysis:\n");
-        semanticAnalysis(rootNode);
+        SymbolTable *symbolTable = semanticAnalysis(rootNode);
+        
+        generateCode(filename, rootNode, symbolTable);
+        
+        freeSymbolTable(symbolTable);
         freeTree(rootNode);
     } else {
         fprintf(stderr, "Error: No syntax tree generated\n");
