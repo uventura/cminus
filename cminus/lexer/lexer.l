@@ -1,18 +1,22 @@
 %{
+#include "syntactic/tree-node.h"
 #include "utils/debug.h"
 #include "syntactic/syntactic.tab.h"
+#include <string.h> 
 %}
 
 %option noyywrap
+%option yylineno
 
 WHITESPACE_T  [ \t]
 LETTER_T      [a-zA-Z]
 ID_T  {LETTER_T}+
 DIGIT_EXPR       [0-9]
 NUMBER_T      {DIGIT_EXPR}+
-KEYWORDS_T    else|if|int|return|void|while
+KEYWORDS_T    "else"|"if"|"int"|"return"|"void"|"while" 
 ANY_EXPR .|\n
 SPECIAL_T "+"|"-"|"*"|"/"|"<"|"<="|">"|">="|"=="|"!="|"="|";"|","|"("|")"|"["|"]"|"{"|"}"
+
 
 %x COMMENT_STATE
 START_COMMENT   "/*"
@@ -38,8 +42,9 @@ END_COMMENT    "*/"
 {NUMBER_T} {
 #ifdef LEXER_MODE
     debug_print("[ %s \033[0;33m<Number>\033[0m ]", yytext);
-#endif
+#else
     return NUMBER;
+#endif
 }
 {KEYWORDS_T} {
 #ifdef LEXER_MODE
@@ -57,6 +62,9 @@ END_COMMENT    "*/"
 #ifdef LEXER_MODE
     debug_print("[ %s \033[0;33m<Identifier>\033[0m ]", yytext);
 #endif
+
+    debug_print("\tdebug Lexer: Found ID '%s'\n", yytext);  // Debug
+    yylval.cadeia = strdup(yytext);  // Set the semantic value
     return ID;
 }
 
@@ -96,7 +104,7 @@ END_COMMENT    "*/"
 #ifdef LEXER_MODE
     debug_print("[ \\n \033[0;33m<Newline>\033[0m ]");
 #endif
-    // ignore return '\n';
+    // This will be handled automatically by %option yylineno
 }
 
 [^\n]   { debug_print("[ %s \033[0;31m<undefined>\033[0m ]", yytext);}

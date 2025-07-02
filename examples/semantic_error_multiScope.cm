@@ -1,0 +1,23 @@
+{
+    int x;
+    int y;
+    
+    x = 5;
+    y = 10;
+    
+    if (y < x) {
+        
+        int printSymbolTable;
+        x = x + 1; 
+    
+    } else {
+    
+        int inScope;
+        if(1){
+            inScope = 1;
+            printSymbolTable= 0;
+        }
+
+    }
+
+}
