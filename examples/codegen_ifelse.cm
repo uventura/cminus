@@ -1,10 +1,16 @@
+
 {
-    int a;
-    a = 10;
-    if (a <= 10) {
-        a = 1;
-    }
-    else {
-        a = 0;
+    int x;
+    int y;
+    
+    x = 10;
+    y = 20;
+
+    x = x + y;
+
+    if (x < 50) {
+        int z;
+        z = x * 2; 
+        
     }
 }

@@ -15,7 +15,8 @@ typedef struct Symbol {
     int dataType;
     int scope;
     int offset;
-    int wasUsed; 
+    int wasUsed;
+    int assigned_reg; 
     struct Symbol *next;
 } Symbol;
 

@@ -1736,7 +1736,6 @@ int main(int argc, char *argv[])
         printf("Semantic analysis:\n");
         SymbolTable *symbolTable = semanticAnalysis(rootNode);
         
-        printf("Generating code:\n");
         generateCode(filename, rootNode, symbolTable);
         
         freeSymbolTable(symbolTable);

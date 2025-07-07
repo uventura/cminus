@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "symbol-table.h"
+#include "../codegen/codegen.h"
 
 static int nextOffset = 0;
 
@@ -33,9 +34,12 @@ void checkUnusedVariables(SymbolTable *table, int currentScope) {
     }
 }
 
+// Em semantic/symbol-table.c, na função exitScope
+
 void exitScope(SymbolTable *table) {
     if (!table) return;
-    // warns of unused variables in  scope
+    
+    // Warns of unused variables in the current scope
     checkUnusedVariables(table, table->currentScope);
     
     Symbol **ptr = &table->head;
@@ -43,14 +47,24 @@ void exitScope(SymbolTable *table) {
         if ((*ptr)->scope == table->currentScope) {
             Symbol *toRemove = *ptr;
             *ptr = toRemove->next;
-            free(toRemove->name);
-            free(toRemove);
+            
+            // --- NOVO TRECHO DE CÓDIGO AQUI ---
+            // Se o símbolo que está sendo removido é uma VARIÁVEL
+            // E ela tinha um registrador atribuído (assigned_reg != -1)
+            if (toRemove->type == VAR && toRemove->assigned_reg != -1) {
+                // Chame a função de `codegen.c` para liberar esse registrador físico.
+                free_gpr(toRemove->assigned_reg); 
+            }
+            // --- FIM DO NOVO TRECHO ---
+
+            free(toRemove->name); // Libera a memória do nome da variável
+            free(toRemove);       // Libera a memória do próprio símbolo
         } else {
-            ptr = &(*ptr)->next;
+            ptr = &(*ptr)->next; // Move para o próximo símbolo na lista
         }
     }
     
-    table->currentScope--;
+    table->currentScope--; // Decrementa o escopo atual
 }
 Symbol* lookup(SymbolTable *table, const char *name) {
     // printf("\tDEBUG LOOKING UP: %s at scope %d\n", name, table->currentScope);   //# DEBUG
@@ -104,6 +118,8 @@ Symbol* insert(SymbolTable *table, const char *name, SymbolType type, int dataTy
 
     Symbol* symbol = malloc(sizeof(Symbol));
     if (!symbol) return NULL;
+
+    symbol->assigned_reg = -1; // Indica que a variável ainda não está em um registrador
 
     symbol->name = strdup(name);  // Now safe since we checked name
     if (!symbol->name) {

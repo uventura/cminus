@@ -1,6 +1,5 @@
-#line 2 "cminus/lexer/lexer.c"
 
-#line 4 "cminus/lexer/lexer.c"
+#line 3 "<stdout>"
 
 #define  YY_INT_ALIGNED short int
 
@@ -507,9 +506,9 @@ char *yytext;
 #include "utils/debug.h"
 #include "syntactic/syntactic.tab.h"
 #include <string.h> 
-#line 511 "cminus/lexer/lexer.c"
+#line 510 "<stdout>"
 
-#line 513 "cminus/lexer/lexer.c"
+#line 512 "<stdout>"
 
 #define INITIAL 0
 #define COMMENT_STATE 1
@@ -731,7 +730,7 @@ YY_DECL
 #line 27 "cminus/lexer/lexer.l"
 
 
-#line 735 "cminus/lexer/lexer.c"
+#line 734 "<stdout>"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -922,7 +921,7 @@ YY_RULE_SETUP
 #line 112 "cminus/lexer/lexer.l"
 ECHO;
 	YY_BREAK
-#line 926 "cminus/lexer/lexer.c"
+#line 925 "<stdout>"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(COMMENT_STATE):
 case YY_STATE_EOF(LEXING_ERROR):
