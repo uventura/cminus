@@ -83,38 +83,72 @@ static void cGen(TreeNode *t) {
     case NPlus:
     case NMinus:
     case NMultiply:
-    case NDivide:{
-        cGen(t->children[0]);
-        emitRM("ST",AC,--tmpOffset,MP,"push");
-        
-        cGen(t->children[1]);
-        emitRM("LD",AC1,tmpOffset++,MP,"pop");
-        
-        switch (t->type) {
-            case NPlus:     emitRO("ADD",AC,AC1,AC,"+"); break;
-            case NMinus:    emitRO("SUB",AC,AC1,AC,"-"); break;
-            case NMultiply: emitRO("MUL",AC,AC1,AC,"*"); break;
-            case NDivide:   emitRO("DIV",AC,AC1,AC,"/"); break;
-            default: break;
-        }
-        break;
-    }
-
+    case NDivide:
     case NLess:
     case NLessEqual:
     case NGreater:
     case NGreaterEqual:
     case NEqual:
     case NNotEqual:{
+  // 1. Gera código para o operando esquerdo. O resultado estará em AC.
         cGen(t->children[0]);
-        emitRM("ST",AC,--tmpOffset,MP,"push");
 
+        // 2. Decrementa tmpOffset para alocar um novo slot para o temporário.
+        --tmpOffset;
+
+        // 3. Decide se o temporário vai para um registrador ou para a memória.
+        //    Registradores disponíveis para temporários: AC1 (1), R2 (2), R3 (3), R4 (4).
+        //    Pool de registradores temporários: de 1 a 4.
+        //    Se tmpOffset for -1, abs(tmpOffset) = 1 (AC1)
+        //    Se tmpOffset for -2, abs(tmpOffset) = 2 (R2)
+        //    Se tmpOffset for -3, abs(tmpOffset) = 3 (R3)
+        //    Se tmpOffset for -4, abs(tmpOffset) = 4 (R4)
+        if (abs(tmpOffset) >= 1 && abs(tmpOffset) <= 4) {
+            int targetReg = abs(tmpOffset); // Registrador destino (1 a 4)
+            // Usa LDA como MOV: move o valor de AC para o registrador temporário
+            emitRM("LDA", targetReg, 0, AC, "push temp to register");
+        } else {
+            // Pool de registradores esgotada ou tmpOffset fora do range, volta para a memória
+            emitRM("ST", AC, tmpOffset, MP, "push temp to memory");
+        }
+
+        // 4. Gera código para o operando direito. O resultado estará em AC.
         cGen(t->children[1]);
-        emitRM("LD",AC1,tmpOffset++,MP,"pop");
 
-        emitRO("SUB",AC,AC1,AC,"L-R");
+        // 5. Carrega o operando esquerdo de volta para AC1 (ou R0, se preferir, mas AC1 é o padrão).
+        //    O valor de tmpOffset ainda aponta para o slot onde o temporário foi salvo.
+        if (abs(tmpOffset) >= 1 && abs(tmpOffset) <= 4) {
+            int sourceReg = abs(tmpOffset); // Registrador de onde o temp foi salvo
+            // Usa LDA como MOV: move o valor do registrador temporário para AC1
+            emitRM("LDA", AC1, 0, sourceReg, "pop temp from register to AC1");
+        } else {
+            // Temporário foi salvo na memória, carrega de lá para AC1
+            emitRM("LD", AC1, tmpOffset, MP, "pop temp from memory to AC1");
+        }
+
+        // 6. Incrementa tmpOffset para liberar o slot temporário.
+        tmpOffset++;
+
+        // 7. Emite a instrução da operação real.
+        //    Neste ponto, o operando esquerdo está em AC1, e o operando direito está em AC.
+        switch (t->type) {
+            case NPlus:         emitRO("ADD", AC, AC1, AC, "+"); break;
+            case NMinus:        emitRO("SUB", AC, AC1, AC, "-"); break;
+            case NMultiply:     emitRO("MUL", AC, AC1, AC, "*"); break;
+            case NDivide:       emitRO("DIV", AC, AC1, AC, "/"); break;
+            // Para operações relacionais, o resultado da comparação (L-R) já está em AC
+            case NLess:
+            case NLessEqual:
+            case NGreater:
+            case NGreaterEqual:
+            case NEqual:
+            case NNotEqual:     emitRO("SUB", AC, AC1, AC, "compare (L-R)"); break;
+            default: break; // Caso inesperado
+        }
         break;
     }
+    // --- FIM DA SEÇÃO CRÍTICA PARA A OTIMIZAÇÃO ---
+    
 
     case NIfStmt: {
         NodeType rel = t->children[0]->type;
