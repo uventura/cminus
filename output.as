@@ -1,72 +1,72 @@
 LEXER: Found ID 'a'
-PARSER: Creating ID node from 'a' (pointer: 0x58955baa4790)
-PARSER: Set node name to 0x58955baa4800
+PARSER: Creating ID node from 'a' (pointer: 0x60a39d1fc790)
+PARSER: Set node name to 0x60a39d1fc800
 DECLARATION: Set type 0 for identifier a
 LEXER: Found ID 'b'
-PARSER: Creating ID node from 'b' (pointer: 0x58955baa48c0)
-PARSER: Set node name to 0x58955baa4930
+PARSER: Creating ID node from 'b' (pointer: 0x60a39d1fc8c0)
+PARSER: Set node name to 0x60a39d1fc930
 DECLARATION: Set type 0 for identifier b
 LEXER: Found ID 'c'
-PARSER: Creating ID node from 'c' (pointer: 0x58955baa49f0)
-PARSER: Set node name to 0x58955baa4a60
+PARSER: Creating ID node from 'c' (pointer: 0x60a39d1fc9f0)
+PARSER: Set node name to 0x60a39d1fca60
 DECLARATION: Set type 0 for identifier c
 LEXER: Found ID 'd'
-PARSER: Creating ID node from 'd' (pointer: 0x58955baa4b20)
-PARSER: Set node name to 0x58955baa4b90
+PARSER: Creating ID node from 'd' (pointer: 0x60a39d1fcb20)
+PARSER: Set node name to 0x60a39d1fcb90
 DECLARATION: Set type 0 for identifier d
 LEXER: Found ID 'e'
-PARSER: Creating ID node from 'e' (pointer: 0x58955baa4c50)
-PARSER: Set node name to 0x58955baa4cc0
+PARSER: Creating ID node from 'e' (pointer: 0x60a39d1fcc50)
+PARSER: Set node name to 0x60a39d1fccc0
 DECLARATION: Set type 0 for identifier e
 LEXER: Found ID 'f'
-PARSER: Creating ID node from 'f' (pointer: 0x58955baa4d80)
-PARSER: Set node name to 0x58955baa4df0
+PARSER: Creating ID node from 'f' (pointer: 0x60a39d1fcd80)
+PARSER: Set node name to 0x60a39d1fcdf0
 DECLARATION: Set type 0 for identifier f
 LEXER: Found ID 'result'
-PARSER: Creating ID node from 'result' (pointer: 0x58955baa4eb0)
-PARSER: Set node name to 0x58955baa4f20
+PARSER: Creating ID node from 'result' (pointer: 0x60a39d1fceb0)
+PARSER: Set node name to 0x60a39d1fcf20
 DECLARATION: Set type 0 for identifier result
 LEXER: Found ID 'a'
-PARSER: Creating ID node from 'a' (pointer: 0x58955baa4f90)
-PARSER: Set node name to 0x58955baa5000
+PARSER: Creating ID node from 'a' (pointer: 0x60a39d1fcf90)
+PARSER: Set node name to 0x60a39d1fd000
 LEXER: Found ID 'b'
-PARSER: Creating ID node from 'b' (pointer: 0x58955baa50c0)
-PARSER: Set node name to 0x58955baa5130
+PARSER: Creating ID node from 'b' (pointer: 0x60a39d1fd0c0)
+PARSER: Set node name to 0x60a39d1fd130
 LEXER: Found ID 'c'
-PARSER: Creating ID node from 'c' (pointer: 0x58955baa51f0)
-PARSER: Set node name to 0x58955baa5260
+PARSER: Creating ID node from 'c' (pointer: 0x60a39d1fd1f0)
+PARSER: Set node name to 0x60a39d1fd260
 LEXER: Found ID 'd'
-PARSER: Creating ID node from 'd' (pointer: 0x58955baa5320)
-PARSER: Set node name to 0x58955baa5390
+PARSER: Creating ID node from 'd' (pointer: 0x60a39d1fd320)
+PARSER: Set node name to 0x60a39d1fd390
 LEXER: Found ID 'e'
-PARSER: Creating ID node from 'e' (pointer: 0x58955baa5450)
-PARSER: Set node name to 0x58955baa54c0
+PARSER: Creating ID node from 'e' (pointer: 0x60a39d1fd450)
+PARSER: Set node name to 0x60a39d1fd4c0
 LEXER: Found ID 'f'
-PARSER: Creating ID node from 'f' (pointer: 0x58955baa5580)
-PARSER: Set node name to 0x58955baa55f0
+PARSER: Creating ID node from 'f' (pointer: 0x60a39d1fd580)
+PARSER: Set node name to 0x60a39d1fd5f0
 LEXER: Found ID 'result'
-PARSER: Creating ID node from 'result' (pointer: 0x58955baa56b0)
-PARSER: Set node name to 0x58955baa5720
+PARSER: Creating ID node from 'result' (pointer: 0x60a39d1fd6b0)
+PARSER: Set node name to 0x60a39d1fd720
 LEXER: Found ID 'a'
-PARSER: Creating ID node from 'a' (pointer: 0x58955baa5740)
-PARSER: Set node name to 0x58955baa57b0
+PARSER: Creating ID node from 'a' (pointer: 0x60a39d1fd740)
+PARSER: Set node name to 0x60a39d1fd7b0
 LEXER: Found ID 'b'
-PARSER: Creating ID node from 'b' (pointer: 0x58955baa57d0)
-PARSER: Set node name to 0x58955baa5840
+PARSER: Creating ID node from 'b' (pointer: 0x60a39d1fd7d0)
+PARSER: Set node name to 0x60a39d1fd840
 LEXER: Found ID 'c'
-PARSER: Creating ID node from 'c' (pointer: 0x58955baa5860)
-PARSER: Set node name to 0x58955baa58d0
+PARSER: Creating ID node from 'c' (pointer: 0x60a39d1fd860)
+PARSER: Set node name to 0x60a39d1fd8d0
 LEXER: Found ID 'd'
-PARSER: Creating ID node from 'd' (pointer: 0x58955baa5940)
-PARSER: Set node name to 0x58955baa59b0
+PARSER: Creating ID node from 'd' (pointer: 0x60a39d1fd940)
+PARSER: Set node name to 0x60a39d1fd9b0
 LEXER: Found ID 'e'
-PARSER: Creating ID node from 'e' (pointer: 0x58955baa5a70)
-PARSER: Set node name to 0x58955baa5ae0
+PARSER: Creating ID node from 'e' (pointer: 0x60a39d1fda70)
+PARSER: Set node name to 0x60a39d1fdae0
 LEXER: Found ID 'f'
-PARSER: Creating ID node from 'f' (pointer: 0x58955baa5b50)
-PARSER: Set node name to 0x58955baa5bc0
+PARSER: Creating ID node from 'f' (pointer: 0x60a39d1fdb50)
+PARSER: Set node name to 0x60a39d1fdbc0
 Program node creation
-Root node set to 0x58955baa5d20
+Root node set to 0x60a39d1fdd20
 Program syntax is correct!
 
 ===== Syntactic Tree =====

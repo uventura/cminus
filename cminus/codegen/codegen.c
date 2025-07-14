@@ -4,10 +4,11 @@
 #include "codegen.h"
 #include "../semantic/symbol-table.h"
 
+
 static char codeText[MAX_CODE][LINE_SIZE];
 static int emitLoc = 0;
-static int tmpOffset = 0;
-static SymbolTable *symtab = NULL;
+static int tmpOffset = 0; // Offset para variáveis temporárias na pilha, relativo a MP
+static SymbolTable *symtab = NULL; // Tabela de símbolos para lookup de variáveis
 
 void emitRO(const char *op, int r, int s, int t, const char *c) {
     snprintf(
@@ -39,19 +40,44 @@ int emitSkip(int n) {
 }
 
 static void patchRM(int loc, int n) {
-    char op[8]; int r, d, s;
-    sscanf(codeText[loc] + 5, "%7s %d,%d(%d)", op, &r, &d, &s);
+    char op[8]; int r, d_old, s;
+    char comment_part[LINE_SIZE];
+
+    const char *line = codeText[loc];
+    if (sscanf(line + 5, "%7s %d,%d(%d)", op, &r, &d_old, &s) != 4) {
+        fprintf(stderr, "Error parsing instruction at line %d for patching: %s\n", loc, line);
+        exit(1);
+    }
+
+    if (COMMENTS_ENABLED) {
+        const char *comment_start_ptr = strstr(line, " \t* ");
+        if (comment_start_ptr) {
+            strncpy(comment_part, comment_start_ptr + 4, LINE_SIZE - 1);
+            comment_part[LINE_SIZE - 1] = '\0';
+            char *existing_patched_suffix = strstr(comment_part, " patched");
+            if (existing_patched_suffix) {
+                *existing_patched_suffix = '\0';
+            }
+        } else {
+            comment_part[0] = '\0';
+        }
+    } else {
+        comment_part[0] = '\0';
+    }
+
     snprintf(
         codeText[loc], LINE_SIZE,
-        "%3d:  %s  %d,%d(%d)%spatched",
+        "%3d:  %s  %d,%d(%d)%s%s%s",
         loc, op, r, n, s,
-        COMMENTS_ENABLED ? " \t* " : " "
+        COMMENTS_ENABLED ? " \t* " : " ",
+        COMMENTS_ENABLED ? comment_part : "",
+        COMMENTS_ENABLED ? " patched" : "patched"
     );
 }
 
 int getMemLoc(const char *name) {
     Symbol *s = lookup(symtab, name);
-    if (!s) { fprintf(stderr,"Var '%s' not found\n", name); exit(1); }
+    if (!s) { fprintf(stderr,"Var '%s' not found in symbol table.\n", name); exit(1); }
     return s->offset;
 }
 
@@ -65,18 +91,18 @@ static void cGen(TreeNode *t) {
     case NAssign:{
         cGen(t->children[1]);
         int loc = getMemLoc(t->children[0]->attribute.name);
-        emitRM("ST",AC,loc,GP,"store");
+        emitRM("ST",AC,loc,GP,"store variable");
         break;
     }
 
     case NIdentifier:{
         int loc = getMemLoc(t->attribute.name);
-        emitRM("LD",AC,loc,GP,"load");
+        emitRM("LD",AC,loc,GP,"load identifier");
         break;
     }
 
     case NNumber:{
-        emitRM("LDC",AC,t->attribute.value,0,"const");
+        emitRM("LDC",AC,t->attribute.value,0,"load constant");
         break;
     }
 
@@ -90,65 +116,43 @@ static void cGen(TreeNode *t) {
     case NGreaterEqual:
     case NEqual:
     case NNotEqual:{
-  // 1. Gera código para o operando esquerdo. O resultado estará em AC.
         cGen(t->children[0]);
 
-        // 2. Decrementa tmpOffset para alocar um novo slot para o temporário.
         --tmpOffset;
-
-        // 3. Decide se o temporário vai para um registrador ou para a memória.
-        //    Registradores disponíveis para temporários: AC1 (1), R2 (2), R3 (3), R4 (4).
-        //    Pool de registradores temporários: de 1 a 4.
-        //    Se tmpOffset for -1, abs(tmpOffset) = 1 (AC1)
-        //    Se tmpOffset for -2, abs(tmpOffset) = 2 (R2)
-        //    Se tmpOffset for -3, abs(tmpOffset) = 3 (R3)
-        //    Se tmpOffset for -4, abs(tmpOffset) = 4 (R4)
-        if (abs(tmpOffset) >= 1 && abs(tmpOffset) <= 4) {
-            int targetReg = abs(tmpOffset); // Registrador destino (1 a 4)
-            // Usa LDA como MOV: move o valor de AC para o registrador temporário
+        if (abs(tmpOffset) >= 1 && abs(tmpOffset) <= 3) {
+            int targetReg = abs(tmpOffset) + 1; 
             emitRM("LDA", targetReg, 0, AC, "push temp to register");
         } else {
-            // Pool de registradores esgotada ou tmpOffset fora do range, volta para a memória
-            emitRM("ST", AC, tmpOffset, MP, "push temp to memory");
+            emitRM("ST", AC, tmpOffset, MP, "push temp to memory (fallback)");
         }
 
-        // 4. Gera código para o operando direito. O resultado estará em AC.
         cGen(t->children[1]);
 
-        // 5. Carrega o operando esquerdo de volta para AC1 (ou R0, se preferir, mas AC1 é o padrão).
-        //    O valor de tmpOffset ainda aponta para o slot onde o temporário foi salvo.
-        if (abs(tmpOffset) >= 1 && abs(tmpOffset) <= 4) {
-            int sourceReg = abs(tmpOffset); // Registrador de onde o temp foi salvo
-            // Usa LDA como MOV: move o valor do registrador temporário para AC1
+
+        if (abs(tmpOffset) >= 1 && abs(tmpOffset) <= 3) { 
+            int sourceReg = abs(tmpOffset) + 1;
             emitRM("LDA", AC1, 0, sourceReg, "pop temp from register to AC1");
         } else {
-            // Temporário foi salvo na memória, carrega de lá para AC1
-            emitRM("LD", AC1, tmpOffset, MP, "pop temp from memory to AC1");
+            emitRM("LD", AC1, tmpOffset, MP, "pop temp from memory to AC1 (fallback)");
         }
 
-        // 6. Incrementa tmpOffset para liberar o slot temporário.
         tmpOffset++;
 
-        // 7. Emite a instrução da operação real.
-        //    Neste ponto, o operando esquerdo está em AC1, e o operando direito está em AC.
         switch (t->type) {
-            case NPlus:         emitRO("ADD", AC, AC1, AC, "+"); break;
-            case NMinus:        emitRO("SUB", AC, AC1, AC, "-"); break;
-            case NMultiply:     emitRO("MUL", AC, AC1, AC, "*"); break;
-            case NDivide:       emitRO("DIV", AC, AC1, AC, "/"); break;
-            // Para operações relacionais, o resultado da comparação (L-R) já está em AC
+            case NPlus:         emitRO("ADD", AC, AC1, AC, "add"); break;
+            case NMinus:        emitRO("SUB", AC, AC1, AC, "subtract"); break;
+            case NMultiply:     emitRO("MUL", AC, AC1, AC, "multiply"); break;
+            case NDivide:       emitRO("DIV", AC, AC1, AC, "divide"); break;
             case NLess:
             case NLessEqual:
             case NGreater:
             case NGreaterEqual:
             case NEqual:
-            case NNotEqual:     emitRO("SUB", AC, AC1, AC, "compare (L-R)"); break;
-            default: break; // Caso inesperado
+            case NNotEqual:     emitRO("SUB", AC, AC1, AC, "compare (LHS - RHS)"); break;
+            default: break;
         }
         break;
     }
-    // --- FIM DA SEÇÃO CRÍTICA PARA A OTIMIZAÇÃO ---
-    
 
     case NIfStmt: {
         NodeType rel = t->children[0]->type;
@@ -156,13 +160,13 @@ static void cGen(TreeNode *t) {
 
         int jFalse = emitLoc;
         switch (rel) {
-            case NLess:         emitRM("JGE",AC,0,PC,"if False"); break;
-            case NLessEqual:    emitRM("JGT",AC,0,PC,"if False"); break;
-            case NGreater:      emitRM("JLE",AC,0,PC,"if False"); break;
-            case NGreaterEqual: emitRM("JLT",AC,0,PC,"if False"); break;
-            case NEqual:        emitRM("JNE",AC,0,PC,"if False"); break;
-            case NNotEqual:     emitRM("JEQ",AC,0,PC,"if False"); break;
-            default:            emitRM("JEQ",AC,0,PC,"if False"); break;
+            case NLess:         emitRM("JGE",AC,0,PC,"if false (LHS < RHS)"); break;
+            case NLessEqual:    emitRM("JGT",AC,0,PC,"if false (LHS <= RHS)"); break;
+            case NGreater:      emitRM("JLE",AC,0,PC,"if false (LHS > RHS)"); break;
+            case NGreaterEqual: emitRM("JLT",AC,0,PC,"if false (LHS >= RHS)"); break;
+            case NEqual:        emitRM("JNE",AC,0,PC,"if false (LHS == RHS)"); break;
+            case NNotEqual:     emitRM("JEQ",AC,0,PC,"if false (LHS != RHS)"); break;
+            default:            emitRM("JEQ",AC,0,PC,"if false (default)"); break;
         }
 
         cGen(t->children[1]);
@@ -178,19 +182,19 @@ static void cGen(TreeNode *t) {
 
         int jFalse = emitLoc;
         switch (rel) {
-            case NLess:         emitRM("JGE",AC,0,PC,"if False"); break;
-            case NLessEqual:    emitRM("JGT",AC,0,PC,"if False"); break;
-            case NGreater:      emitRM("JLE",AC,0,PC,"if False"); break;
-            case NGreaterEqual: emitRM("JLT",AC,0,PC,"if False"); break;
-            case NEqual:        emitRM("JNE",AC,0,PC,"if False"); break;
-            case NNotEqual:     emitRM("JEQ",AC,0,PC,"if False"); break;
-            default:            emitRM("JEQ",AC,0,PC,"if False"); break;
+            case NLess:         emitRM("JGE",AC,0,PC,"if false (LHS < RHS) -> else"); break;
+            case NLessEqual:    emitRM("JGT",AC,0,PC,"if false (LHS <= RHS) -> else"); break;
+            case NGreater:      emitRM("JLE",AC,0,PC,"if false (LHS > RHS) -> else"); break;
+            case NGreaterEqual: emitRM("JLT",AC,0,PC,"if false (LHS >= RHS) -> else"); break;
+            case NEqual:        emitRM("JNE",AC,0,PC,"if false (LHS == RHS) -> else"); break;
+            case NNotEqual:     emitRM("JEQ",AC,0,PC,"if false (LHS != RHS) -> else"); break;
+            default:            emitRM("JEQ",AC,0,PC,"if false (default) -> else"); break;
         }
 
         cGen(t->children[1]);
 
         int jmpEnd = emitLoc;
-        emitRM("LDA",PC,0,PC,"goto");
+        emitRM("LDA",PC,0,PC,"jump over else block");
 
         int elseLoc = emitLoc;
         patchRM(jFalse, elseLoc - (jFalse + 1));
@@ -223,8 +227,14 @@ void codeToFile(const char *filename) {
 void generateCode(const char *filename, TreeNode *syntaxTree, SymbolTable *symbolTable) {
     symtab = symbolTable;
 
-    emitRM("LD",MP,0,0,"load MP <- mem[0]");
-    emitRM("ST",AC,0,0,"zero mem[0]");
+
+    emitRM("LDC", GP, 0, 0, "Initialize GP to 0 (base for static data)");
+
+    emitRM("LDC", MP, TM_MAX_MEM - 1, 0, "Initialize MP to top of memory (stack base, grows down)");
+
+    emitRM("LDC", AC, 0, 0, "Clear AC (accumulator)");
+
+    emitRM("ST", AC, 0, 0, "Clear mem[0] (or initialize global 0 constant)");
 
     cGen(syntaxTree);
 

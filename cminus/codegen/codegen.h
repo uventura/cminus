@@ -12,6 +12,8 @@
 #define GP  5
 #define MP  6
 #define PC  7
+#define TM_MAX_MEM 1024 // Total memory size for the Tiny Machine (example value, adjust as needed)
+
 
 void generateCode(const char* filename, TreeNode* syntaxTree, SymbolTable *symbolTable);
 
