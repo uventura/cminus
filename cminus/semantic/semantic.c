@@ -64,10 +64,11 @@ void semanticAnalysis(TreeNode *syntaxTree) {
     
     if (hasSemanticErrors) {
         fprintf(stderr, "Compilation failed due to semantic errors\n");
+        freeSymbolTable(table);
         exit(1);
     }
-    fprintf(stderr, "Symbol table \n");
-    printSymbolTable(table);
+    // fprintf(stderr, "Symbol table \n");
+    // printSymbolTable(table);
     freeSymbolTable(table);
     printf("Program is semantically correct!\n");
 }
