@@ -81,7 +81,9 @@ extern int yydebug;
     PLUS = 282,                    /* PLUS  */
     MINUS = 283,                   /* MINUS  */
     ASSIGN = 284,                  /* ASSIGN  */
-    LOWER_THAN_ELSE = 285          /* LOWER_THAN_ELSE  */
+    READ = 285,                    /* READ  */
+    WRITE = 286,                   /* WRITE  */
+    LOWER_THAN_ELSE = 287          /* LOWER_THAN_ELSE  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -96,7 +98,7 @@ union YYSTYPE
     int num_value;
     char* cadeia;
 
-#line 100 "cminus/syntactic/syntactic.tab.h"
+#line 102 "cminus/syntactic/syntactic.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

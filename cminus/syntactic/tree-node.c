@@ -70,6 +70,7 @@ const char* nodeTypeToString(NodeType type) {
         case NAssign:         return "Assign";
         case NIfStmt:         return "If Statement";
         case NMultiply:       return "Multiply";
+        case NDivide:         return "Divide";
         case NPlus:           return "Plus";
         case NMinus:          return "Minus";
         case NLess:           return "Less";
@@ -78,6 +79,9 @@ const char* nodeTypeToString(NodeType type) {
         case NGreaterEqual:   return "GreaterEqual";
         case NEqual:          return "Equal";
         case NNotEqual:       return "Not Equal";
+        case NRead:           return "Read";
+        case NWrite:          return "Write";
+        case NWhile:          return "While";
         default:              return "Unknown";
     }
 }

@@ -39,6 +39,7 @@ void yyerror(char *s);
 %left PLUS MINUS
 %left MULTIPLY DIVIDE
 %right ASSIGN
+%token READ WRITE
 
 %nonassoc LESS LESS_EQUAL GREATER GREATER_EQUAL
 %nonassoc EQUAL NOT_EQUAL
@@ -132,6 +133,14 @@ simple_stmt:
         $$->children[0] = $1;
         $$->children[1] = $3;
     }
+    | READ identifier {
+        $$ = newTreeNode(NRead, yylineno);
+        $$->children[0] = $2;
+      }
+    | WRITE expr {
+        $$ = newTreeNode(NWrite, yylineno);
+        $$->children[0] = $2;
+    }
 ;
 
 compound_stmt: 
@@ -145,6 +154,11 @@ compound_stmt:
         $$->children[0] = $3; // condition (expr)
         $$->children[1] = $5; // then-part (stmt)
         $$->children[2] = $7; // else-part (stmt)
+    }
+    | WHILE OPEN_PARENTHESIS expr CLOSE_PARENTHESIS stmt {
+        $$ = newTreeNode(NWhile, yylineno);
+        $$->children[0] = $3;  // condition
+        $$->children[1] = $5;  // body-part
     }
     | block {
         $$ = $1; // block already returns a TreeNode*
