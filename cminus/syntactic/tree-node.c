@@ -49,6 +49,43 @@ TreeNode *newBinaryNode(NodeType type, TreeNode *left, TreeNode *right, int line
     return node;
 }
 
+const char* nodeTypeToString(NodeType type) {
+    switch(type) {
+        case NProgram:        return "Program";
+        case NCmdList:        return "CmdList";
+        case NCmd:            return "Cmd";
+        case NAssignStmt:     return "AssignStmt";
+        case NIdentifier:     return "Identifier";
+        case NExpr:           return "Expr";
+        case NOperator:       return "Operator";
+        case NNumber:         return "Number";
+        case NIfElseStmt:     return "IfElse Statement";
+        case NReturnStmt:     return "Return Statement";
+        case NCompoundStmt:   return "Compound Statement";
+        case NType:           return "Type";
+        case NStatement:      return "Statement";
+        case NDeclaration:    return "Declaration";
+        case NCall:           return "Call";
+        case NBlock:          return "Block";
+        case NAssign:         return "Assign";
+        case NIfStmt:         return "If Statement";
+        case NMultiply:       return "Multiply";
+        case NDivide:         return "Divide";
+        case NPlus:           return "Plus";
+        case NMinus:          return "Minus";
+        case NLess:           return "Less";
+        case NLessEqual:      return "LessEqual";
+        case NGreater:        return "Greater";
+        case NGreaterEqual:   return "GreaterEqual";
+        case NEqual:          return "Equal";
+        case NNotEqual:       return "Not Equal";
+        case NRead:           return "Read";
+        case NWrite:          return "Write";
+        case NWhile:          return "While";
+        default:              return "Unknown";
+    }
+}
+
 const char* typeToString(DataType type) {
     switch(type) {
         case TYPE_INT:  return "int";
@@ -58,42 +95,46 @@ const char* typeToString(DataType type) {
     }
 }
 
+static void printTreeRec(const TreeNode *t,int depth){
+    if(!t) return;
+
+    for(int i=0;i<(depth*2);i++) putchar(' ');
+    printf("%s", nodeTypeToString(t->type));
+
+    switch(t->type){
+        case NIdentifier:
+            printf("  [name=\"%s\"]", t->attribute.name);
+            break;
+
+        case NNumber:
+            printf("  [value=%d]", t->attribute.value);
+            break;
+
+        case NOperator:
+            printf("  [op='%c']",  t->attribute.op);
+            break;
+
+        case NType:
+            printf("  [dataType=%s]", typeToString(t->dataType));
+            break;
+
+        default: break;
+    }
+    printf("  (line %d)\n", t->lineno);
+
+    for(int i=0;i<MAX_CHILDREN;i++)
+        printTreeRec(t->children[i], depth+1);
+
+    printTreeRec(t->sibling, depth);
+}
+
+void printTree(const TreeNode *t){
+    puts("\n===== Syntactic Tree =====");
+    printTreeRec(t,0);
+    puts("============================\n");
+}
+
 // TreeNode * newTreeNode(NodeType type, int lineno);
 // extern TreeNode *rootNode;  // Global syntax tree root
 
 TreeNode *rootNode = NULL;  // Definition of global root node
-
-// helpers
-const char* getNodeTypeName(NodeType type) {
-    switch (type) {
-        case NProgram: return "NProgram";
-        case NCmdList: return "NCmdList";
-        case NCmd: return "NCmd";
-        case NAssignStmt: return "NAssignStmt";
-        case NIdentifier: return "NIdentifier";
-        case NExpr: return "NExpr";
-        case NOperator: return "NOperator";
-        case NNumber: return "NNumber";
-        case NIfElseStmt: return "NIfElseStmt";
-        case NReturnStmt: return "NReturnStmt";
-        case NCompoundStmt: return "NCompoundStmt";
-        case NType: return "NType";
-        case NStatement: return "NStatement";
-        case NDeclaration: return "NDeclaration";
-        case NCall: return "NCall";
-        case NBlock: return "NBlock";
-        case NAssign: return "NAssign";
-        case NIfStmt: return "NIfStmt";
-        case NMultiply: return "NMultiply";
-        case NDivide: return "NDivide";
-        case NPlus: return "NPlus";
-        case NMinus: return "NMinus";
-        case NLess: return "NLess";
-        case NLessEqual: return "NLessEqual";
-        case NGreater: return "NGreater";
-        case NGreaterEqual: return "NGreaterEqual";
-        case NEqual: return "NEqual";
-        case NNotEqual: return "NNotEqual";
-        default: return "Unknown NodeType";
-    }
-}

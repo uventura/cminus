@@ -3,18 +3,21 @@
 #define MAX_CHILDREN 3
 
 typedef enum {
-    NProgram, NCmdList, NCmd, 
-    NAssignStmt, NIdentifier, NExpr,  
-    NOperator, NNumber, NIfElseStmt, 
-    NReturnStmt, NCompoundStmt, NType,  
-    NStatement, NDeclaration, NCall, 
-    NBlock, NAssign, NIfStmt, 
-    NMultiply, NDivide, NPlus, 
-    NMinus,NLess,NLessEqual, 
-    NGreater,NGreaterEqual,NEqual, 
-    NNotEqual
+    NProgram, NCmdList, NCmd, //1
+    NAssignStmt, NIdentifier, NExpr,  //2
+    NOperator, NNumber, NIfElseStmt, //3
+    NReturnStmt, NCompoundStmt, NType,  //4
+    NStatement, NDeclaration, NCall, //5
+    NBlock, NAssign, NIfStmt, //6 
+    NMultiply, NDivide, NPlus, //7
+    NMinus,NLess,NLessEqual, //8
+    NGreater,NGreaterEqual,NEqual, //9 
+    NNotEqual,
+    NRead, NWrite,
+    NWhile
 } NodeType;
 
+const char* nodeTypeToString(NodeType type);
 
 typedef enum {
     TYPE_INT,   
@@ -58,9 +61,7 @@ typedef struct treeNode {
 TreeNode * newTreeNode(NodeType type, int lineno);
 TreeNode *newBinaryNode(NodeType type, TreeNode *left, TreeNode *right, int lineno);
 void freeTree(TreeNode *node);
+void printTree(const TreeNode *t);
 extern TreeNode *rootNode;  // Global syntax tree root
-
-// helpers
-const char* getNodeTypeName(NodeType type);
 
 #endif

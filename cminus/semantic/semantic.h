@@ -5,7 +5,7 @@
 #include "symbol-table.h"
 
 // Main semantic analysis function
-void semanticAnalysis(TreeNode *syntaxTree);
+SymbolTable* semanticAnalysis(TreeNode *syntaxTree);
 
 // Node checking functions
 void checkProgram(TreeNode *node, SymbolTable *table);

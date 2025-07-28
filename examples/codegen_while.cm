@@ -1,0 +1,8 @@
+{ 
+    int x;
+    read x;
+    while (x > 0) {
+        write x;
+        x = x - 1;
+    }
+}

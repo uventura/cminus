@@ -3,6 +3,8 @@
 #include <string.h>
 #include "symbol-table.h"
 
+static int nextOffset = 0;
+
 SymbolTable* createSymbolTable() {
     SymbolTable *table = (SymbolTable*)malloc(sizeof(SymbolTable));
     if (!table) return NULL;
@@ -115,6 +117,7 @@ Symbol* insert(SymbolTable *table, const char *name, SymbolType type, int dataTy
     symbol->next = table->head;
     table->head = symbol;
     symbol->wasUsed = 0;  // unused
+    if (type == VAR) symbol->offset = nextOffset++;
     
     return symbol;
 }

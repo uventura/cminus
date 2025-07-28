@@ -13,7 +13,7 @@ LETTER_T      [a-zA-Z]
 ID_T  {LETTER_T}+
 DIGIT_EXPR       [0-9]
 NUMBER_T      {DIGIT_EXPR}+
-KEYWORDS_T    "else"|"if"|"int"|"return"|"void"|"while" 
+KEYWORDS_T    "else"|"if"|"int"|"return"|"void"|"while"|"read"|"write"
 ANY_EXPR .|\n
 SPECIAL_T "+"|"-"|"*"|"/"|"<"|"<="|">"|">="|"=="|"!="|"="|";"|","|"("|")"|"["|"]"|"{"|"}"
 
@@ -43,6 +43,7 @@ END_COMMENT    "*/"
 #ifdef LEXER_MODE
     debug_print("[ %s \033[0;33m<Number>\033[0m ]", yytext);
 #else
+    yylval.num_value = atoi(yytext);
     return NUMBER;
 #endif
 }
@@ -56,6 +57,8 @@ END_COMMENT    "*/"
     else if (strcmp(yytext, "return") == 0) return RETURN;
     else if (strcmp(yytext, "void") == 0) return VOID;
     else if (strcmp(yytext, "while") == 0) return WHILE;
+    else if (strcmp(yytext, "read") == 0) return READ;
+    else if (strcmp(yytext, "write") == 0) return WRITE;
 }
 
 {ID_T} {
@@ -63,7 +66,7 @@ END_COMMENT    "*/"
     debug_print("[ %s \033[0;33m<Identifier>\033[0m ]", yytext);
 #endif
 
-    debug_print("\tdebug Lexer: Found ID '%s'\n", yytext);  // Debug
+    printf("LEXER: Found ID '%s'\n", yytext);  // Debug
     yylval.cadeia = strdup(yytext);  // Set the semantic value
     return ID;
 }

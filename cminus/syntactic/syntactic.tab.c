@@ -71,7 +71,7 @@
 
 #include "tree-node.h"
 #include "../semantic/semantic.h" 
-#include "../utils/debug.h" 
+#include "../codegen/codegen.h" 
 #include <stdio.h> 
 #include <stdlib.h>
 #include <string.h> 
@@ -80,10 +80,11 @@ extern int lineno;
 extern int yylineno;
 extern TreeNode *rootNode;
 extern char* yytext;
+extern FILE *yyin;
 int yylex();
 void yyerror(char *s);
 
-#line 87 "cminus/syntactic/syntactic.tab.c"
+#line 88 "cminus/syntactic/syntactic.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -141,20 +142,22 @@ enum yysymbol_kind_t
   YYSYMBOL_PLUS = 27,                      /* PLUS  */
   YYSYMBOL_MINUS = 28,                     /* MINUS  */
   YYSYMBOL_ASSIGN = 29,                    /* ASSIGN  */
-  YYSYMBOL_LOWER_THAN_ELSE = 30,           /* LOWER_THAN_ELSE  */
-  YYSYMBOL_YYACCEPT = 31,                  /* $accept  */
-  YYSYMBOL_input = 32,                     /* input  */
-  YYSYMBOL_line = 33,                      /* line  */
-  YYSYMBOL_program = 34,                   /* program  */
-  YYSYMBOL_block = 35,                     /* block  */
-  YYSYMBOL_declaration = 36,               /* declaration  */
-  YYSYMBOL_type_specifier = 37,            /* type_specifier  */
-  YYSYMBOL_stmt_list = 38,                 /* stmt_list  */
-  YYSYMBOL_stmt = 39,                      /* stmt  */
-  YYSYMBOL_simple_stmt = 40,               /* simple_stmt  */
-  YYSYMBOL_compound_stmt = 41,             /* compound_stmt  */
-  YYSYMBOL_identifier = 42,                /* identifier  */
-  YYSYMBOL_expr = 43                       /* expr  */
+  YYSYMBOL_READ = 30,                      /* READ  */
+  YYSYMBOL_WRITE = 31,                     /* WRITE  */
+  YYSYMBOL_LOWER_THAN_ELSE = 32,           /* LOWER_THAN_ELSE  */
+  YYSYMBOL_YYACCEPT = 33,                  /* $accept  */
+  YYSYMBOL_input = 34,                     /* input  */
+  YYSYMBOL_line = 35,                      /* line  */
+  YYSYMBOL_program = 36,                   /* program  */
+  YYSYMBOL_block = 37,                     /* block  */
+  YYSYMBOL_declaration = 38,               /* declaration  */
+  YYSYMBOL_type_specifier = 39,            /* type_specifier  */
+  YYSYMBOL_stmt_list = 40,                 /* stmt_list  */
+  YYSYMBOL_stmt = 41,                      /* stmt  */
+  YYSYMBOL_simple_stmt = 42,               /* simple_stmt  */
+  YYSYMBOL_compound_stmt = 43,             /* compound_stmt  */
+  YYSYMBOL_identifier = 44,                /* identifier  */
+  YYSYMBOL_expr = 45                       /* expr  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -485,19 +488,19 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  3
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   81
+#define YYLAST   112
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  31
+#define YYNTOKENS  33
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  13
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  32
+#define YYNRULES  35
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  55
+#define YYNSTATES  64
 
 /* YYMAXUTOK -- Last valid token kind.  */
-#define YYMAXUTOK   285
+#define YYMAXUTOK   287
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
@@ -539,17 +542,17 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
-      25,    26,    27,    28,    29,    30
+      25,    26,    27,    28,    29,    30,    31,    32
 };
 
 #if YYDEBUG
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    50,    50,    52,    53,    56,    59,    75,    81,    92,
-      96,   103,   113,   119,   122,   125,   129,   137,   142,   148,
-     154,   173,   174,   175,   176,   177,   178,   179,   180,   181,
-     182,   183,   184
+       0,    52,    52,    54,    55,    58,    61,    77,    83,    94,
+      98,   105,   115,   121,   124,   127,   131,   136,   140,   147,
+     152,   158,   163,   169,   188,   189,   190,   191,   192,   193,
+     194,   195,   196,   197,   198,   199
 };
 #endif
 
@@ -570,8 +573,8 @@ static const char *const yytname[] =
   "LESS_EQUAL", "GREATER", "GREATER_EQUAL", "EQUAL", "NOT_EQUAL", "COMMA",
   "OPEN_PARENTHESIS", "CLOSE_PARENTHESIS", "OPEN_BRACKET", "CLOSE_BRACKET",
   "ELSE", "IF", "INT", "RETURN", "VOID", "WHILE", "PLUS", "MINUS",
-  "ASSIGN", "LOWER_THAN_ELSE", "$accept", "input", "line", "program",
-  "block", "declaration", "type_specifier", "stmt_list", "stmt",
+  "ASSIGN", "READ", "WRITE", "LOWER_THAN_ELSE", "$accept", "input", "line",
+  "program", "block", "declaration", "type_specifier", "stmt_list", "stmt",
   "simple_stmt", "compound_stmt", "identifier", "expr", YY_NULLPTR
 };
 
@@ -582,7 +585,7 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 }
 #endif
 
-#define YYPACT_NINF (-17)
+#define YYPACT_NINF (-47)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -596,12 +599,13 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      38,   -17,    44,   -17,    28,   -17,   -17,   -17,   -17,   -10,
-     -17,   -17,   -17,   -17,     7,    13,    28,    33,   -17,    16,
-      30,    36,   -17,   -17,   -17,    30,   -17,   -17,     3,   -17,
-      14,    30,    30,    30,    30,    30,    30,    30,    30,    28,
-      30,    30,    -9,    -9,    66,    66,    66,    66,    53,    53,
-      26,    60,    60,    28,   -17
+       6,   -47,     4,   -47,    -3,   -47,   -47,   -47,   -47,    -9,
+     -47,   -47,     9,    17,     7,   -47,   -47,    17,    26,    -3,
+      29,   -47,    27,     7,     7,   -47,   -47,   -47,    60,    50,
+     -47,   -47,   -47,     7,    19,    49,     7,     7,     7,     7,
+       7,     7,     7,     7,     7,     7,   -47,    60,    -3,    -3,
+      28,    28,    38,    38,    38,    38,     3,     3,    97,    97,
+      47,   -47,    -3,   -47
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -609,26 +613,27 @@ static const yytype_int8 yypact[] =
    means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       0,     4,     0,     1,    12,     3,     5,     6,    20,     0,
-       9,    10,    19,    15,     0,     0,    12,     0,    14,     0,
-       0,     0,     7,    11,    13,     0,    32,    31,     0,     8,
-      16,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,    21,    22,    25,    26,    27,    28,    29,    30,
-      17,    23,    24,     0,    18
+       0,     4,     0,     1,    12,     3,     5,     6,    23,     0,
+       9,    10,     0,     0,     0,    22,    15,     0,     0,    12,
+       0,    14,     0,     0,     0,    17,    35,    34,    18,     0,
+       7,    11,    13,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     8,    16,     0,     0,
+      24,    25,    28,    29,    30,    31,    32,    33,    26,    27,
+      19,    21,     0,    20
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -17,   -17,   -17,   -17,    67,   -17,   -17,    46,   -16,   -17,
-     -17,    -4,    23
+     -47,   -47,   -47,   -47,    67,   -47,   -47,    59,   -46,   -47,
+     -47,    -4,    56
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-       0,     2,     5,     6,    12,    13,    14,    15,    16,    17,
-      18,    27,    28
+       0,     2,     5,     6,    15,    16,    17,    18,    19,    20,
+      21,    27,    28
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -636,58 +641,65 @@ static const yytype_int8 yydefgoto[] =
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-      19,    33,    34,    35,    36,    37,    38,    20,    31,    32,
-      21,     8,    19,    33,    34,    35,    36,    37,    38,    31,
-      32,    39,    22,    50,    33,    34,    35,    36,    37,    38,
-      40,    41,     8,    26,     8,    19,     4,    54,    -2,     1,
-      24,    40,    41,    29,     3,    25,    -2,    53,    30,    19,
-       9,    10,     4,    11,    42,    43,    44,    45,    46,    47,
-      48,    49,    23,    51,    52,    31,    32,    -3,    -3,     7,
-      33,    34,    35,    36,    37,    38,    -3,    -3,    -3,    -3,
-      37,    38
+      22,     8,    60,    61,     3,     4,    -2,     1,    23,    25,
+      26,     8,     4,    29,    -2,    22,    63,    -3,    -3,     9,
+      10,     8,    11,    12,    36,    37,    24,    13,    14,    38,
+      39,    40,    41,    42,    43,    30,    32,    48,    38,    39,
+      40,    41,    42,    43,    22,    22,    44,    45,    -3,    -3,
+      -3,    -3,    42,    43,    36,    37,    33,    46,    22,    38,
+      39,    40,    41,    42,    43,    36,    37,    49,    62,     7,
+      38,    39,    40,    41,    42,    43,    44,    45,    31,    34,
+      35,     0,     0,     0,     0,     0,     0,    44,    45,    47,
+       0,     0,    50,    51,    52,    53,    54,    55,    56,    57,
+      58,    59,    36,    37,     0,     0,     0,    38,    39,    40,
+      41,    42,    43
 };
 
 static const yytype_int8 yycheck[] =
 {
-       4,    10,    11,    12,    13,    14,    15,    17,     5,     6,
-      14,     4,    16,    10,    11,    12,    13,    14,    15,     5,
-       6,    18,     9,    39,    10,    11,    12,    13,    14,    15,
-      27,    28,     4,     3,     4,    39,     8,    53,     0,     1,
-       7,    27,    28,     7,     0,    29,     8,    21,    25,    53,
-      22,    23,     8,    25,    31,    32,    33,    34,    35,    36,
-      37,    38,    16,    40,    41,     5,     6,    14,    15,     2,
-      10,    11,    12,    13,    14,    15,    10,    11,    12,    13,
-      14,    15
+       4,     4,    48,    49,     0,     8,     0,     1,    17,    13,
+       3,     4,     8,    17,     8,    19,    62,    14,    15,    22,
+      23,     4,    25,    26,     5,     6,    17,    30,    31,    10,
+      11,    12,    13,    14,    15,     9,     7,    18,    10,    11,
+      12,    13,    14,    15,    48,    49,    27,    28,    10,    11,
+      12,    13,    14,    15,     5,     6,    29,     7,    62,    10,
+      11,    12,    13,    14,    15,     5,     6,    18,    21,     2,
+      10,    11,    12,    13,    14,    15,    27,    28,    19,    23,
+      24,    -1,    -1,    -1,    -1,    -1,    -1,    27,    28,    33,
+      -1,    -1,    36,    37,    38,    39,    40,    41,    42,    43,
+      44,    45,     5,     6,    -1,    -1,    -1,    10,    11,    12,
+      13,    14,    15
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
    state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     1,    32,     0,     8,    33,    34,    35,     4,    22,
-      23,    25,    35,    36,    37,    38,    39,    40,    41,    42,
-      17,    42,     9,    38,     7,    29,     3,    42,    43,     7,
-      43,     5,     6,    10,    11,    12,    13,    14,    15,    18,
-      27,    28,    43,    43,    43,    43,    43,    43,    43,    43,
-      39,    43,    43,    21,    39
+       0,     1,    34,     0,     8,    35,    36,    37,     4,    22,
+      23,    25,    26,    30,    31,    37,    38,    39,    40,    41,
+      42,    43,    44,    17,    17,    44,     3,    44,    45,    44,
+       9,    40,     7,    29,    45,    45,     5,     6,    10,    11,
+      12,    13,    14,    15,    27,    28,     7,    45,    18,    18,
+      45,    45,    45,    45,    45,    45,    45,    45,    45,    45,
+      41,    41,    21,    41
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    31,    32,    32,    32,    33,    34,    35,    36,    37,
-      37,    38,    38,    39,    39,    39,    40,    41,    41,    41,
-      42,    43,    43,    43,    43,    43,    43,    43,    43,    43,
-      43,    43,    43
+       0,    33,    34,    34,    34,    35,    36,    37,    38,    39,
+      39,    40,    40,    41,    41,    41,    42,    42,    42,    43,
+      43,    43,    43,    44,    45,    45,    45,    45,    45,    45,
+      45,    45,    45,    45,    45,    45
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr2[] =
 {
        0,     2,     0,     2,     1,     1,     1,     3,     3,     1,
-       1,     2,     0,     2,     1,     1,     3,     5,     7,     1,
-       1,     3,     3,     3,     3,     3,     3,     3,     3,     3,
-       3,     1,     1
+       1,     2,     0,     2,     1,     1,     3,     2,     2,     5,
+       7,     5,     1,     1,     3,     3,     3,     3,     3,     3,
+       3,     3,     3,     3,     1,     1
 };
 
 
@@ -1264,21 +1276,21 @@ yyreduce:
   switch (yyn)
     {
   case 4: /* input: error  */
-#line 53 "cminus/syntactic/syntactic.y"
+#line 55 "cminus/syntactic/syntactic.y"
           { yyerror("Invalid input"); yyclearin; }
-#line 1270 "cminus/syntactic/syntactic.tab.c"
+#line 1282 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 5: /* line: program  */
-#line 56 "cminus/syntactic/syntactic.y"
+#line 58 "cminus/syntactic/syntactic.y"
               { printf("Program syntax is correct!\n"); }
-#line 1276 "cminus/syntactic/syntactic.tab.c"
+#line 1288 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 6: /* program: block  */
-#line 59 "cminus/syntactic/syntactic.y"
+#line 61 "cminus/syntactic/syntactic.y"
                { 
-    debug_print("debug Parser: Program node creation\n");
+    printf("Program node creation\n");
     (yyval.node) = newTreeNode(NProgram, (yyloc).first_line);
     if ((yyvsp[0].node) == NULL) {
         printf("!! Block is NULL!\n");
@@ -1291,53 +1303,52 @@ yyreduce:
     rootNode = (yyval.node);
     printf("Root node set to %p\n", (void*)rootNode);
 }
-#line 1295 "cminus/syntactic/syntactic.tab.c"
+#line 1307 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 7: /* block: OPEN_BRACES stmt_list CLOSE_BRACES  */
-#line 75 "cminus/syntactic/syntactic.y"
+#line 77 "cminus/syntactic/syntactic.y"
                                           {
     (yyval.node) = newTreeNode(NBlock, yylineno);
     (yyval.node)->children[0] = (yyvsp[-1].node);  // stmt_list
-    debug_print("\tdebug Syntactic: Created block node\n");
 }
-#line 1305 "cminus/syntactic/syntactic.tab.c"
+#line 1316 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 8: /* declaration: type_specifier identifier SEMICOLON  */
-#line 81 "cminus/syntactic/syntactic.y"
+#line 83 "cminus/syntactic/syntactic.y"
                                                  {
     (yyval.node) = newTreeNode(NDeclaration, yylineno);
     (yyval.node)->children[0] = (yyvsp[-2].node);  // type (INT/VOID)
     (yyval.node)->children[1] = (yyvsp[-1].node);  // identifier (e.g., "a")
     // Ensure type is properly set in the identifier
     (yyvsp[-1].node)->dataType = (yyvsp[-2].node)->dataType;
-    debug_print("debug Parser: DECLARATION Set type %d for identifier %s\n", 
+    printf("DECLARATION: Set type %d for identifier %s\n", 
            (yyvsp[-2].node)->dataType, (yyvsp[-1].node)->attribute.name);
 }
-#line 1319 "cminus/syntactic/syntactic.tab.c"
+#line 1330 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 9: /* type_specifier: INT  */
-#line 92 "cminus/syntactic/syntactic.y"
+#line 94 "cminus/syntactic/syntactic.y"
         {
         (yyval.node) = newTreeNode(NType, yylineno);
         (yyval.node)->dataType = TYPE_INT;  // Use consistent type value
     }
-#line 1328 "cminus/syntactic/syntactic.tab.c"
+#line 1339 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 10: /* type_specifier: VOID  */
-#line 96 "cminus/syntactic/syntactic.y"
+#line 98 "cminus/syntactic/syntactic.y"
          {
         (yyval.node) = newTreeNode(NType, yylineno);
         (yyval.node)->dataType = TYPE_VOID;
     }
-#line 1337 "cminus/syntactic/syntactic.tab.c"
+#line 1348 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 11: /* stmt_list: stmt stmt_list  */
-#line 103 "cminus/syntactic/syntactic.y"
+#line 105 "cminus/syntactic/syntactic.y"
                    {
         if ((yyvsp[-1].node) == NULL) {
             (yyval.node) = (yyvsp[0].node);
@@ -1348,76 +1359,104 @@ yyreduce:
             (yyval.node) = (yyvsp[-1].node);
         }
     }
-#line 1352 "cminus/syntactic/syntactic.tab.c"
+#line 1363 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 12: /* stmt_list: %empty  */
-#line 113 "cminus/syntactic/syntactic.y"
+#line 115 "cminus/syntactic/syntactic.y"
                 {
         (yyval.node) = NULL;
     }
-#line 1360 "cminus/syntactic/syntactic.tab.c"
+#line 1371 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 13: /* stmt: simple_stmt SEMICOLON  */
-#line 119 "cminus/syntactic/syntactic.y"
+#line 121 "cminus/syntactic/syntactic.y"
                           {
         (yyval.node) = (yyvsp[-1].node);
     }
-#line 1368 "cminus/syntactic/syntactic.tab.c"
+#line 1379 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 14: /* stmt: compound_stmt  */
-#line 122 "cminus/syntactic/syntactic.y"
+#line 124 "cminus/syntactic/syntactic.y"
                   {
         (yyval.node) = (yyvsp[0].node);
     }
-#line 1376 "cminus/syntactic/syntactic.tab.c"
+#line 1387 "cminus/syntactic/syntactic.tab.c"
     break;
 
   case 16: /* simple_stmt: identifier ASSIGN expr  */
-#line 129 "cminus/syntactic/syntactic.y"
+#line 131 "cminus/syntactic/syntactic.y"
                            {
         (yyval.node) = newTreeNode(NAssign, yylineno);
         (yyval.node)->children[0] = (yyvsp[-2].node);
         (yyval.node)->children[1] = (yyvsp[0].node);
     }
-#line 1386 "cminus/syntactic/syntactic.tab.c"
+#line 1397 "cminus/syntactic/syntactic.tab.c"
     break;
 
-  case 17: /* compound_stmt: IF OPEN_PARENTHESIS expr CLOSE_PARENTHESIS stmt  */
-#line 137 "cminus/syntactic/syntactic.y"
+  case 17: /* simple_stmt: READ identifier  */
+#line 136 "cminus/syntactic/syntactic.y"
+                      {
+        (yyval.node) = newTreeNode(NRead, yylineno);
+        (yyval.node)->children[0] = (yyvsp[0].node);
+      }
+#line 1406 "cminus/syntactic/syntactic.tab.c"
+    break;
+
+  case 18: /* simple_stmt: WRITE expr  */
+#line 140 "cminus/syntactic/syntactic.y"
+                 {
+        (yyval.node) = newTreeNode(NWrite, yylineno);
+        (yyval.node)->children[0] = (yyvsp[0].node);
+    }
+#line 1415 "cminus/syntactic/syntactic.tab.c"
+    break;
+
+  case 19: /* compound_stmt: IF OPEN_PARENTHESIS expr CLOSE_PARENTHESIS stmt  */
+#line 147 "cminus/syntactic/syntactic.y"
                                                                           {
         (yyval.node) = newTreeNode(NIfStmt, yylineno);
         (yyval.node)->children[0] = (yyvsp[-2].node); // condition (expr)
         (yyval.node)->children[1] = (yyvsp[0].node); // then-part (stmt)
     }
-#line 1396 "cminus/syntactic/syntactic.tab.c"
+#line 1425 "cminus/syntactic/syntactic.tab.c"
     break;
 
-  case 18: /* compound_stmt: IF OPEN_PARENTHESIS expr CLOSE_PARENTHESIS stmt ELSE stmt  */
-#line 142 "cminus/syntactic/syntactic.y"
+  case 20: /* compound_stmt: IF OPEN_PARENTHESIS expr CLOSE_PARENTHESIS stmt ELSE stmt  */
+#line 152 "cminus/syntactic/syntactic.y"
                                                                 {
         (yyval.node) = newTreeNode(NIfElseStmt, yylineno);
         (yyval.node)->children[0] = (yyvsp[-4].node); // condition (expr)
         (yyval.node)->children[1] = (yyvsp[-2].node); // then-part (stmt)
         (yyval.node)->children[2] = (yyvsp[0].node); // else-part (stmt)
     }
-#line 1407 "cminus/syntactic/syntactic.tab.c"
+#line 1436 "cminus/syntactic/syntactic.tab.c"
     break;
 
-  case 19: /* compound_stmt: block  */
-#line 148 "cminus/syntactic/syntactic.y"
+  case 21: /* compound_stmt: WHILE OPEN_PARENTHESIS expr CLOSE_PARENTHESIS stmt  */
+#line 158 "cminus/syntactic/syntactic.y"
+                                                         {
+        (yyval.node) = newTreeNode(NWhile, yylineno);
+        (yyval.node)->children[0] = (yyvsp[-2].node);  // condition
+        (yyval.node)->children[1] = (yyvsp[0].node);  // body-part
+    }
+#line 1446 "cminus/syntactic/syntactic.tab.c"
+    break;
+
+  case 22: /* compound_stmt: block  */
+#line 163 "cminus/syntactic/syntactic.y"
             {
         (yyval.node) = (yyvsp[0].node); // block already returns a TreeNode*
     }
-#line 1415 "cminus/syntactic/syntactic.tab.c"
+#line 1454 "cminus/syntactic/syntactic.tab.c"
     break;
 
-  case 20: /* identifier: ID  */
-#line 154 "cminus/syntactic/syntactic.y"
+  case 23: /* identifier: ID  */
+#line 169 "cminus/syntactic/syntactic.y"
        {
-        debug_print("\tdebug Parser: Creating ID node from '%s' (pointer: %p)\n", (yyvsp[0].cadeia), (yyvsp[0].cadeia));  // Debug
+        printf("PARSER: Creating ID node from '%s' (pointer: %p)\n", (yyvsp[0].cadeia), (yyvsp[0].cadeia));  // Debug
         (yyval.node) = newTreeNode(NIdentifier, yylineno);
         if ((yyvsp[0].cadeia) == NULL) {
             yyerror("Identifier name is NULL");
@@ -1430,88 +1469,88 @@ yyreduce:
         }
         // Initialize dataType to some default (will be overwritten by declaration)
         (yyval.node)->dataType = -1; 
-        debug_print("\tdebug Parser: Set node name to %p\n", (yyval.node)->attribute.name);  // Debug
+        printf("PARSER: Set node name to %p\n", (yyval.node)->attribute.name);  // Debug
     }
-#line 1436 "cminus/syntactic/syntactic.tab.c"
+#line 1475 "cminus/syntactic/syntactic.tab.c"
     break;
 
-  case 21: /* expr: expr MULTIPLY expr  */
-#line 173 "cminus/syntactic/syntactic.y"
+  case 24: /* expr: expr MULTIPLY expr  */
+#line 188 "cminus/syntactic/syntactic.y"
                        { (yyval.node) = newBinaryNode(NMultiply, (yyvsp[-2].node), (yyvsp[0].node), yylineno); }
-#line 1442 "cminus/syntactic/syntactic.tab.c"
+#line 1481 "cminus/syntactic/syntactic.tab.c"
     break;
 
-  case 22: /* expr: expr DIVIDE expr  */
-#line 174 "cminus/syntactic/syntactic.y"
+  case 25: /* expr: expr DIVIDE expr  */
+#line 189 "cminus/syntactic/syntactic.y"
                        { (yyval.node) = newBinaryNode(NDivide, (yyvsp[-2].node), (yyvsp[0].node), yylineno); }
-#line 1448 "cminus/syntactic/syntactic.tab.c"
+#line 1487 "cminus/syntactic/syntactic.tab.c"
     break;
 
-  case 23: /* expr: expr PLUS expr  */
-#line 175 "cminus/syntactic/syntactic.y"
+  case 26: /* expr: expr PLUS expr  */
+#line 190 "cminus/syntactic/syntactic.y"
                      { (yyval.node) = newBinaryNode(NPlus, (yyvsp[-2].node), (yyvsp[0].node), yylineno); }
-#line 1454 "cminus/syntactic/syntactic.tab.c"
+#line 1493 "cminus/syntactic/syntactic.tab.c"
     break;
 
-  case 24: /* expr: expr MINUS expr  */
-#line 176 "cminus/syntactic/syntactic.y"
+  case 27: /* expr: expr MINUS expr  */
+#line 191 "cminus/syntactic/syntactic.y"
                       { (yyval.node) = newBinaryNode(NMinus, (yyvsp[-2].node), (yyvsp[0].node), yylineno); }
-#line 1460 "cminus/syntactic/syntactic.tab.c"
+#line 1499 "cminus/syntactic/syntactic.tab.c"
     break;
 
-  case 25: /* expr: expr LESS expr  */
-#line 177 "cminus/syntactic/syntactic.y"
+  case 28: /* expr: expr LESS expr  */
+#line 192 "cminus/syntactic/syntactic.y"
                      { (yyval.node) = newBinaryNode(NLess, (yyvsp[-2].node), (yyvsp[0].node), yylineno); }
-#line 1466 "cminus/syntactic/syntactic.tab.c"
+#line 1505 "cminus/syntactic/syntactic.tab.c"
     break;
 
-  case 26: /* expr: expr LESS_EQUAL expr  */
-#line 178 "cminus/syntactic/syntactic.y"
+  case 29: /* expr: expr LESS_EQUAL expr  */
+#line 193 "cminus/syntactic/syntactic.y"
                            { (yyval.node) = newBinaryNode(NLessEqual, (yyvsp[-2].node), (yyvsp[0].node), yylineno); }
-#line 1472 "cminus/syntactic/syntactic.tab.c"
+#line 1511 "cminus/syntactic/syntactic.tab.c"
     break;
 
-  case 27: /* expr: expr GREATER expr  */
-#line 179 "cminus/syntactic/syntactic.y"
+  case 30: /* expr: expr GREATER expr  */
+#line 194 "cminus/syntactic/syntactic.y"
                         { (yyval.node) = newBinaryNode(NGreater, (yyvsp[-2].node), (yyvsp[0].node), yylineno); }
-#line 1478 "cminus/syntactic/syntactic.tab.c"
+#line 1517 "cminus/syntactic/syntactic.tab.c"
     break;
 
-  case 28: /* expr: expr GREATER_EQUAL expr  */
-#line 180 "cminus/syntactic/syntactic.y"
+  case 31: /* expr: expr GREATER_EQUAL expr  */
+#line 195 "cminus/syntactic/syntactic.y"
                               { (yyval.node) = newBinaryNode(NGreaterEqual, (yyvsp[-2].node), (yyvsp[0].node), yylineno); }
-#line 1484 "cminus/syntactic/syntactic.tab.c"
+#line 1523 "cminus/syntactic/syntactic.tab.c"
     break;
 
-  case 29: /* expr: expr EQUAL expr  */
-#line 181 "cminus/syntactic/syntactic.y"
+  case 32: /* expr: expr EQUAL expr  */
+#line 196 "cminus/syntactic/syntactic.y"
                       { (yyval.node) = newBinaryNode(NEqual, (yyvsp[-2].node), (yyvsp[0].node), yylineno); }
-#line 1490 "cminus/syntactic/syntactic.tab.c"
+#line 1529 "cminus/syntactic/syntactic.tab.c"
     break;
 
-  case 30: /* expr: expr NOT_EQUAL expr  */
-#line 182 "cminus/syntactic/syntactic.y"
+  case 33: /* expr: expr NOT_EQUAL expr  */
+#line 197 "cminus/syntactic/syntactic.y"
                           { (yyval.node) = newBinaryNode(NNotEqual, (yyvsp[-2].node), (yyvsp[0].node), yylineno); }
-#line 1496 "cminus/syntactic/syntactic.tab.c"
+#line 1535 "cminus/syntactic/syntactic.tab.c"
     break;
 
-  case 31: /* expr: identifier  */
-#line 183 "cminus/syntactic/syntactic.y"
+  case 34: /* expr: identifier  */
+#line 198 "cminus/syntactic/syntactic.y"
                  { (yyval.node) = (yyvsp[0].node); }
-#line 1502 "cminus/syntactic/syntactic.tab.c"
+#line 1541 "cminus/syntactic/syntactic.tab.c"
     break;
 
-  case 32: /* expr: NUMBER  */
-#line 184 "cminus/syntactic/syntactic.y"
+  case 35: /* expr: NUMBER  */
+#line 199 "cminus/syntactic/syntactic.y"
              { 
         (yyval.node) = newTreeNode(NNumber, yylineno); 
         (yyval.node)->attribute.value = (yyvsp[0].num_value);
     }
-#line 1511 "cminus/syntactic/syntactic.tab.c"
+#line 1550 "cminus/syntactic/syntactic.tab.c"
     break;
 
 
-#line 1515 "cminus/syntactic/syntactic.tab.c"
+#line 1554 "cminus/syntactic/syntactic.tab.c"
 
       default: break;
     }
@@ -1709,18 +1748,36 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 190 "cminus/syntactic/syntactic.y"
+#line 205 "cminus/syntactic/syntactic.y"
 
 
-int main() 
+int main(int argc, char *argv[]) 
 {
+    const char *filename = "cminus.tm";
+    if ( argc > 1 ) {
+        yyin = fopen( argv[1], "r" );
+        if (!yyin) {
+            perror(argv[1]);
+            return 1;
+        }
+        if (argc > 2)
+            filename = argv[2];
+    }
+    else yyin = stdin;
+
     rootNode = NULL; 
     
     yyparse();
     
     if (rootNode) {
+        printTree(rootNode);
+
         printf("Semantic analysis:\n");
-        semanticAnalysis(rootNode);
+        SymbolTable *symbolTable = semanticAnalysis(rootNode);
+        
+        generateCode(filename, rootNode, symbolTable);
+        
+        freeSymbolTable(symbolTable);
         freeTree(rootNode);
     } else {
         fprintf(stderr, "Error: No syntax tree generated\n");

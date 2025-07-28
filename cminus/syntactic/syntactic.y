@@ -2,7 +2,7 @@
 %{
 #include "tree-node.h"
 #include "../semantic/semantic.h" 
-#include "../utils/debug.h" 
+#include "../codegen/codegen.h" 
 #include <stdio.h> 
 #include <stdlib.h>
 #include <string.h> 
@@ -11,6 +11,7 @@ extern int lineno;
 extern int yylineno;
 extern TreeNode *rootNode;
 extern char* yytext;
+extern FILE *yyin;
 int yylex();
 void yyerror(char *s);
 %}
@@ -38,6 +39,7 @@ void yyerror(char *s);
 %left PLUS MINUS
 %left MULTIPLY DIVIDE
 %right ASSIGN
+%token READ WRITE
 
 %nonassoc LESS LESS_EQUAL GREATER GREATER_EQUAL
 %nonassoc EQUAL NOT_EQUAL
@@ -57,7 +59,7 @@ line: program { printf("Program syntax is correct!\n"); }
 ;
 
 program: block { 
-    debug_print("debug Parser: Program node creation\n");
+    printf("Program node creation\n");
     $$ = newTreeNode(NProgram, @$.first_line);
     if ($1 == NULL) {
         printf("!! Block is NULL!\n");
@@ -75,8 +77,8 @@ program: block {
 block: OPEN_BRACES stmt_list CLOSE_BRACES {
     $$ = newTreeNode(NBlock, yylineno);
     $$->children[0] = $2;  // stmt_list
-    debug_print("\tdebug Syntactic: Created block node\n");
 }
+;
 
 declaration: type_specifier identifier SEMICOLON {
     $$ = newTreeNode(NDeclaration, yylineno);
@@ -84,7 +86,7 @@ declaration: type_specifier identifier SEMICOLON {
     $$->children[1] = $2;  // identifier (e.g., "a")
     // Ensure type is properly set in the identifier
     $2->dataType = $1->dataType;
-    debug_print("debug Parser: DECLARATION Set type %d for identifier %s\n", 
+    printf("DECLARATION: Set type %d for identifier %s\n", 
            $1->dataType, $2->attribute.name);
 }
 
@@ -131,6 +133,14 @@ simple_stmt:
         $$->children[0] = $1;
         $$->children[1] = $3;
     }
+    | READ identifier {
+        $$ = newTreeNode(NRead, yylineno);
+        $$->children[0] = $2;
+      }
+    | WRITE expr {
+        $$ = newTreeNode(NWrite, yylineno);
+        $$->children[0] = $2;
+    }
 ;
 
 compound_stmt: 
@@ -145,14 +155,19 @@ compound_stmt:
         $$->children[1] = $5; // then-part (stmt)
         $$->children[2] = $7; // else-part (stmt)
     }
+    | WHILE OPEN_PARENTHESIS expr CLOSE_PARENTHESIS stmt {
+        $$ = newTreeNode(NWhile, yylineno);
+        $$->children[0] = $3;  // condition
+        $$->children[1] = $5;  // body-part
+    }
     | block {
         $$ = $1; // block already returns a TreeNode*
     }
 ;
-// !todo ensure strdup($1) is freed in freeTree()
+
 identifier:
     ID {
-        debug_print("\tdebug Parser: Creating ID node from '%s' (pointer: %p)\n", $1, $1);  // Debug
+        printf("PARSER: Creating ID node from '%s' (pointer: %p)\n", $1, $1);  // Debug
         $$ = newTreeNode(NIdentifier, yylineno);
         if ($1 == NULL) {
             yyerror("Identifier name is NULL");
@@ -165,7 +180,7 @@ identifier:
         }
         // Initialize dataType to some default (will be overwritten by declaration)
         $$->dataType = -1; 
-        debug_print("\tdebug Parser: Set node name to %p\n", $$->attribute.name);  // Debug
+        printf("PARSER: Set node name to %p\n", $$->attribute.name);  // Debug
     }
 ;
 
@@ -189,15 +204,33 @@ expr:
 
 %%
 
-int main() 
+int main(int argc, char *argv[]) 
 {
+    const char *filename = "cminus.tm";
+    if ( argc > 1 ) {
+        yyin = fopen( argv[1], "r" );
+        if (!yyin) {
+            perror(argv[1]);
+            return 1;
+        }
+        if (argc > 2)
+            filename = argv[2];
+    }
+    else yyin = stdin;
+
     rootNode = NULL; 
     
     yyparse();
     
     if (rootNode) {
+        printTree(rootNode);
+
         printf("Semantic analysis:\n");
-        semanticAnalysis(rootNode);
+        SymbolTable *symbolTable = semanticAnalysis(rootNode);
+        
+        generateCode(filename, rootNode, symbolTable);
+        
+        freeSymbolTable(symbolTable);
         freeTree(rootNode);
     } else {
         fprintf(stderr, "Error: No syntax tree generated\n");
