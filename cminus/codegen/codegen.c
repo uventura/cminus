@@ -206,6 +206,30 @@ static void cGen(TreeNode *t) {
         break;
     }
 
+    case NRead:
+        emitRO("IN", AC, 0, 0, "read input");
+        emitRM("ST", AC, getMemLoc(t->children[0]->attribute.name), GP, "store input");
+        break;
+
+    case NWrite:
+        cGen(t->children[0]);
+        emitRO("OUT", AC, 0, 0, "output value");
+        break;
+
+    case NWhile: {
+        int startLoc = emitLoc;
+
+        cGen(t->children[0]);
+        int jFalse = emitLoc;
+        emitRM("JEQ", AC, 0, PC, "while false - jump out");
+
+        cGen(t->children[1]);
+        emitRM("LDA", PC, startLoc - emitLoc - 1, PC, "jump to while cond");
+
+        patchRM(jFalse, emitLoc - (jFalse + 1));
+        break;
+    }
+
     default:
         for (int i = 0; i < MAX_CHILDREN; i++)
             cGen(t->children[i]);

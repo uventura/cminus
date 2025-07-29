@@ -12,7 +12,9 @@ typedef enum {
     NMultiply, NDivide, NPlus, //7
     NMinus,NLess,NLessEqual, //8
     NGreater,NGreaterEqual,NEqual, //9 
-    NNotEqual
+    NNotEqual,
+    NRead, NWrite,
+    NWhile
 } NodeType;
 
 const char* nodeTypeToString(NodeType type);

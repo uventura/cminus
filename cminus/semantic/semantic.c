@@ -114,6 +114,29 @@ void checkProgram(TreeNode *node, SymbolTable *table) {
             printf("\tDEBUG: case NIfElseStmt\n");
             checkIfStatement(node, table);
             return;
+        case NRead:
+            printf("\tDEBUG: case NRead\n");
+            if (node->children[0] && node->children[0]->type == NIdentifier) {
+                if (!lookup(table, node->children[0]->attribute.name)) {
+                    semanticError(node->lineno, "Undeclared variable '%s'", node->children[0]->attribute.name);
+                } else {
+                    markSymbolAsUsed(table, node->children[0]->attribute.name);
+                }
+            }
+            return;
+        case NWrite:
+            printf("\tDEBUG: case NWrite\n");
+            if (node->children[0]) checkExpression(node->children[0], table);
+            return;
+        case NWhile:
+            printf("\tDEBUG: case NWhile\n");
+            if (node->children[0]) checkExpression(node->children[0], table);
+            if (node->children[1]) {
+                enterScope(table);
+                checkProgram(node->children[1], table);
+                exitScope(table);
+            }
+            return;
         default:
             printf("\tunexpected node type, likely an ERROR\n");
             break;
@@ -205,6 +228,30 @@ void checkProgram(TreeNode *node, SymbolTable *table) {
                 printf("\tDEBUG: case NAssign\n");
                 checkAssignment(child, table);
                 break;
+            case NWrite:
+                printf("\tDEBUG: case NWrite\n");
+                if (child->children[0]) checkExpression(child->children[0], table);
+                break;
+            case NRead:
+                printf("\tDEBUG: case NRead\n");
+                if (child->children[0] && child->children[0]->type == NIdentifier) {
+                    if (!lookup(table, child->children[0]->attribute.name)) {
+                        semanticError(child->lineno, "Undeclared variable '%s'", child->children[0]->attribute.name);
+                    } else {
+                        markSymbolAsUsed(table, child->children[0]->attribute.name);
+                    }
+                }
+                break;
+            case NWhile:
+                printf("\tDEBUG: case NWhile\n");
+                if (child->children[0]) checkExpression(child->children[0], table);
+                if (child->children[1]) {
+                    enterScope(table);
+                    checkProgram(child->children[1], table);
+                    exitScope(table);
+                }
+                break;
+
             default:
                 semanticError(child->lineno, "Unexpected node type %d in program", child->type);
                 break;
@@ -382,7 +429,7 @@ void checkStatement(TreeNode *node, SymbolTable *table) {
                 checkExpression(node->children[0], table);
             }
             break;
-            
+
         default:
             semanticError(node->lineno, "Unknown statement type");
             break;

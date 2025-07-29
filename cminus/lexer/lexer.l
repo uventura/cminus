@@ -13,7 +13,7 @@ LETTER_T      [a-zA-Z]
 ID_T  {LETTER_T}+
 DIGIT_EXPR       [0-9]
 NUMBER_T      {DIGIT_EXPR}+
-KEYWORDS_T    "else"|"if"|"int"|"return"|"void"|"while" 
+KEYWORDS_T    "else"|"if"|"int"|"return"|"void"|"while"|"read"|"write"
 ANY_EXPR .|\n
 SPECIAL_T "+"|"-"|"*"|"/"|"<"|"<="|">"|">="|"=="|"!="|"="|";"|","|"("|")"|"["|"]"|"{"|"}"
 
@@ -57,6 +57,8 @@ END_COMMENT    "*/"
     else if (strcmp(yytext, "return") == 0) return RETURN;
     else if (strcmp(yytext, "void") == 0) return VOID;
     else if (strcmp(yytext, "while") == 0) return WHILE;
+    else if (strcmp(yytext, "read") == 0) return READ;
+    else if (strcmp(yytext, "write") == 0) return WRITE;
 }
 
 {ID_T} {
